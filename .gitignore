@@ -1,0 +1,8 @@
+logs/
+tmp/
+
+# IDE/OS temp files
+.DS_Store
+*.swp
+*.bak
+*.txt

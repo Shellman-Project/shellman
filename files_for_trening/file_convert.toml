@@ -1,0 +1,17 @@
+name = "Jakub"
+age = 31
+active = true
+skills = [ "Bash", "Python", "YAML",]
+
+[experience]
+years = 10
+domains = [ "DevOps", "Automation", "CLI Tools",]
+
+[projects.shellman]
+stars = 123
+license = "MIT"
+[[projects.shellman.contributors]]
+name = "Jakub"
+role = "Author"
+
+
