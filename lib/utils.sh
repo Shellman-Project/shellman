@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+# 
 info() {
   echo -e "\e[32m[INFO]\e[0m $1"
 }

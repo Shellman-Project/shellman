@@ -261,3 +261,4 @@ check_remote_version
 ensure_user_bin_path
 
 $FIX_MODE && echo -e "\n🛠️  Fix mode: repairs applied where possible.\n"
+ 
