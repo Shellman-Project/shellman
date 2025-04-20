@@ -63,6 +63,7 @@ if [[ "$COMMAND" == "--help" || -z "$COMMAND" ]]; then
   echo "  file_convert   →   Convert between JSON, YAML, TOML formats using Python"
   echo "  date_utils     →   Work with dates: add/subtract, compare, format (e.g. +5d, -2w)"
   echo "  update         →   Update Shellman to the latest local version"
+  echo "  line_endings   →   Convert CRLF ↔ LF line endings (file or directory)"
   echo "  install_bats   →   Install BATS testing framework (for developers)"
   echo "  doctor         →   Diagnose Shellman installation and structure"
   echo "  --help         →   Display help"

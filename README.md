@@ -830,6 +830,29 @@ shellman date_utils --date "2024-05-01 12:00:00" --sub 45min
 ```
 
 ---
+
+### 🔁 `line_endings` – Convert line endings (CRLF ↔ LF)
+
+Convert line endings of a single file or all files in a directory.
+
+#### Usage
+
+```bash
+shellman line_endings --file path/to/file.txt --to lf
+shellman line_endings --file script.ps1 --to crlf
+shellman line_endings --dir ./project --ext .sh --to lf
+```
+
+|Flag | Purpose|
+|-------|------|
+|--file <path>| Convert single file |
+|--dir <path> | Convert all files in director y|
+|--ext <.ext> | (Optional) Only files with given extension |
+|--to lf / crlf |  Target line ending |
+|--help | Show help |
+If dos2unix or unix2dos are not available, a fallback using sed is used.
+
+---
 🤝 Contributing
 Add or copy a script into commands/.
 

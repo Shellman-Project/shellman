@@ -144,12 +144,12 @@ check_or_install_pip() {
     fi
   fi
 }
-
 ensure_user_bin_path() {
   local line='export PATH="$HOME/.local/bin:$PATH"'
   grep -qxF "$line" ~/.bashrc || echo "$line" >> ~/.bashrc
 }
 
+# ---------- Python requirements ------------------------------------------
 check_openpyxl()  { check_python_pkg openpyxl || { warn "openpyxl missing";  $FIX_MODE && install_python_lib openpyxl python3-openpyxl; } }
 check_pandas()    { check_python_pkg pandas   || { warn "pandas missing";    $FIX_MODE && install_python_lib pandas python3-pandas; } }
 check_xlsx2csv() {
@@ -160,16 +160,13 @@ check_xlsx2csv() {
     if $FIX_MODE; then
       if command -v pip3 &>/dev/null; then
         python3 -m pip install --user --break-system-packages --upgrade xlsx2csv && ok "xlsx2csv installed (user pip)"
-        export PATH="$HOME/.local/bin:$PATH"
       else
         warn "pip3 not available — cannot install xlsx2csv"
       fi
     fi
   fi
 }
-
 check_toml()      { check_python_pkg toml     || { warn "toml missing";      $FIX_MODE && install_python_lib toml python3-toml; } }
-
 check_pyyaml() {
   local version
   version=$(python3 -c 'import yaml; print(yaml.__version__)' 2>/dev/null || echo "not found")
@@ -191,6 +188,32 @@ check_or_install_cli() {
   else
     warn "$1 missing"
     $FIX_MODE && pkg_install "$(detect_pkg_mgr)" "$2" && ok "$1 installed"
+  fi
+}
+check_line_end_tools() {
+  local has_dos2unix=false
+  local has_unix2dos=false
+  local has_sed=false
+
+  command -v dos2unix &>/dev/null && has_dos2unix=true
+  command -v unix2dos &>/dev/null && has_unix2dos=true
+  command -v sed &>/dev/null && has_sed=true
+
+  if $has_dos2unix && $has_unix2dos; then
+    ok "dos2unix / unix2dos present"
+  else
+    warn "dos2unix or unix2dos missing"
+    if $FIX_MODE; then
+      pkg_install "$(detect_pkg_mgr)" dos2unix && ok "dos2unix installed"
+    fi
+  fi
+
+  if ! $has_dos2unix || ! $has_unix2dos; then
+    if $has_sed; then
+      warn "Using fallback: sed-based CRLF/LF conversion (less reliable)"
+    else
+      fail "Neither dos2unix/unix2dos nor sed found – line_endings may not work"
+    fi
   fi
 }
 
@@ -216,7 +239,8 @@ check_file_or_warn bin/shellman "launcher script"
 for cmd in count_lines file_stats find_files replace_text merge_files encrypt_files \
            zip_batch clean_files extract_lines csv_extract checksum_files \
            json_extract excel_info excel_preview excel_to_csv excel_diff \
-           file_convert sys_summary tail_follow update doctor date_utils; do
+           file_convert sys_summary tail_follow update doctor date_utils \
+           line_endings; do
   [[ -f "commands/$cmd.sh" ]] && ok "command $cmd found" || warn "command $cmd missing"
 done
 
@@ -232,6 +256,7 @@ check_toml
 check_pyyaml
 check_completion
 ensure_completion_loaded
+check_line_end_tools
 check_remote_version
 ensure_user_bin_path
 
