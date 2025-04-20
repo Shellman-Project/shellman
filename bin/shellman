@@ -40,7 +40,7 @@ if [[ "$COMMAND" == "--help" || -z "$COMMAND" ]]; then
     fi
   done
   echo ""
-  echo "Common commands:"
+  echo "Common commands: "
   echo "  count_lines    →   Count lines in files with filters"
   echo "  file_stats     →   Shows basic information about the file (size, lines, extension)"
   echo "  find_files     →   Searches for files by name, content or extension"

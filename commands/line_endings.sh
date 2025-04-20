@@ -79,7 +79,7 @@ convert_file() {
   fi
 }
 
-# Process files
+# Process files 
 if [[ -n "$FILE" ]]; then
   convert_file "$FILE"
 elif [[ -n "$DIR" ]]; then
