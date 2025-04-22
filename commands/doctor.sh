@@ -165,7 +165,7 @@ ensure_user_bin_path() {
   local line='export PATH="$HOME/.local/bin:$PATH"'
   grep -qxF "$line" ~/.bashrc || echo "$line" >> ~/.bashrc
 }
-
+ 
 # ---------- Python requirements ------------------------------------------
 check_openpyxl()  { check_python_pkg openpyxl || { warn "openpyxl missing";  $FIX_MODE && install_python_lib openpyxl python3-openpyxl; } }
 check_pandas()    { check_python_pkg pandas   || { warn "pandas missing";    $FIX_MODE && install_python_lib pandas python3-pandas; } }
