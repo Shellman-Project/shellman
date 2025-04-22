@@ -6,7 +6,7 @@
 source ./lib/utils.sh
 
 show_help() {
-  echo "Usage:"
+  echo "Usage: "
   echo "  shellman clean_files [options]"
   echo ""
   echo "Description:"
