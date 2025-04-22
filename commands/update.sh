@@ -96,7 +96,7 @@ sudo ln -sf "$INSTALL_DIR/bin/shellman" /usr/local/bin/shellman
 VERSION_MSG="Shellman is now up-to-date"
 [[ "$USE_REMOTE" == true ]] && VERSION_MSG+=" (v$REMOTE_VERSION)" || VERSION_MSG+=" from local clone (v$CLONE_VERSION)"
 echo "✅  $VERSION_MSG"
-
+ 
 # ---------- post-check ----------
 echo ""
 echo "🩺  Running shellman doctor ..."

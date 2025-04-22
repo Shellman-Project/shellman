@@ -15,7 +15,7 @@ ok() {
 warn() {
   echo -e "\e[33m⚠️  $1\e[0m"
 }
-
+ 
 get_file_size_readable() {
   local file="$1"
   if [[ -f "$file" ]]; then
