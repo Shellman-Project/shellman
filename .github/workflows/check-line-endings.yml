@@ -15,15 +15,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Find files with CRLF line endings
+      - name: Find shell scripts with CRLF line endings
+        shell: bash
         run: |
-          echo "🔍 Checking for CRLF endings..."
-          CRLF_FILES=$(grep -Ilr $'\r' . --exclude-dir=.git --include='*.sh')
-          if [[ -n "$CRLF_FILES" ]]; then
-            echo "🚫 The following files contain CRLF (Windows-style) line endings:"
-            echo "$CRLF_FILES"
+          echo "🔍 Checking for CRLF endings in shell scripts..."
+
+          # Szukamy plików .sh zawierających CRLF
+          mapfile -t crlf_files < <(find . -type f -name "*.sh" -exec grep -Il $'\r' {} +)
+
+          if (( ${#crlf_files[@]} > 0 )); then
             echo ""
-            echo "💡 Please convert them to LF endings (e.g., using 'dos2unix')."
+            echo "🚫 The following .sh files contain CRLF (Windows-style) line endings:"
+            for file in "${crlf_files[@]}"; do
+              echo " • $file"
+            done
+            echo ""
+            echo "💡 Please convert them to LF endings using 'dos2unix' or 'shellman line_endings'."
             exit 1
+          else
+            echo "✅ All .sh files use correct LF line endings."
           fi
-          echo "✅ All shell scripts have correct LF endings."
