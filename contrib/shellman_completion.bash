@@ -42,5 +42,5 @@ _shellman() {
     --output) _filedir ;;
   esac
 }
- 
+
 complete -F _shellman shellman
