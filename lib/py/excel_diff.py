@@ -33,7 +33,7 @@ if len(diffs[0]) == 0:
     print("✅  Sheets are identical.")
     sys.exit(0)
 
-def excel_col(n):  # 0‑based -> letters
+def excel_col(n):  # 0‑based -> letters 
     s = ''
     while n >= 0:
         s = chr(n % 26 + 65) + s
