@@ -1,0 +1,29 @@
+name: Check Line Endings
+
+on:
+  pull_request:
+    paths:
+      - '**/*.sh'
+  push:
+    paths:
+      - '**/*.sh'
+
+jobs:
+  check_line_endings:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Find files with CRLF line endings
+        run: |
+          echo "🔍 Checking for CRLF endings..."
+          CRLF_FILES=$(grep -Ilr $'\r' . --exclude-dir=.git --include='*.sh')
+          if [[ -n "$CRLF_FILES" ]]; then
+            echo "🚫 The following files contain CRLF (Windows-style) line endings:"
+            echo "$CRLF_FILES"
+            echo ""
+            echo "💡 Please convert them to LF endings (e.g., using 'dos2unix')."
+            exit 1
+          fi
+          echo "✅ All shell scripts have correct LF endings."
