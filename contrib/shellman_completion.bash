@@ -3,7 +3,7 @@
 
 _shellman() {
   local cur prev words cword
-  _init_completion || return    # sets $cur $prev $words $cword
+  _init_completion || return
 
   # ------ helpers ------
   _filedir_custom() {           # 1 arg = ext mask, "" = all
@@ -14,35 +14,33 @@ _shellman() {
   local cmd_dir="${SHELLMAN_HOME:-/usr/local/lib/shellman}/commands"
   local cmds="$(basename -s .sh "$cmd_dir"/*.sh 2>/dev/null)"
 
-  _flags_for() {                # dynamic flags from --help
+  _flags_for() {
     shellman "$1" --help 2>/dev/null | grep -oE -- '--[a-zA-Z0-9\-]+' | tr '\n' ' '
   }
 
-  # ---------- stage 0 :  komenda bez spacji ----------
-  if [[ $cword -eq 0 ]]; then
+  # ---------- commands after "shellman [TAB]" ----------
+  if [[ $cword -eq 1 && "$cur" != --* ]]; then
     COMPREPLY=( $(compgen -W "$cmds" -- "$cur") )
-    compopt -o nospace
     return
   fi
 
-  # ---------- które sub‑polecenie? ----------
-  local sub="${words[1]}"
-
-  # ---------- stage 1 : global + lokalne flagi ----------
+  # ---------- global and local flags ----------
   if [[ "$cur" == --* ]]; then
     local global="--help --version"
-    if [[ $cword -eq 1 ]]; then        # jeszcze przed nazwą komendy
+    if [[ $cword -eq 1 ]]; then
       COMPREPLY=( $(compgen -W "$global" -- "$cur") )
-    else                               # po nazwie komendy
+    else
+      local sub="${words[1]}"
       COMPREPLY=( $(compgen -W "$(_flags_for "$sub") $global" -- "$cur") )
     fi
     return
   fi
 
-  # ---------- stage 2 : pliki / katalogi dla opcji ----------
+  # ---------- files and directories for options ----------
   case "$prev" in
-    --path)   _filedir ;;      # dowolny plik/katalog
-    --output) _filedir ;;      # pliki w bieżącym kat.
+    --path)   _filedir ;;
+    --output) _filedir ;;
   esac
 }
+ 
 complete -F _shellman shellman
