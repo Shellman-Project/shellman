@@ -89,6 +89,7 @@ check_remote_version() {
 check_completion() {
   local mgr=$(detect_pkg_mgr)
   local dst="/etc/bash_completion.d/shellman_completion.bash"
+
   if ! dpkg -s bash-completion &>/dev/null; then
     warn "bash-completion package not installed"
     if $FIX_MODE && [[ "$mgr" == "apt" ]]; then
@@ -98,15 +99,31 @@ check_completion() {
     ok "bash-completion package present"
   fi
 
+  if $FIX_MODE; then
+    for old in /etc/bash_completion.d/_shellman /etc/bash_completion.d/shellman.bash; do
+      [[ -f "$old" ]] && sudo rm -f "$old" && warn "Removed legacy completion file: $old"
+    done
+  fi
+
   if [[ -f "$dst" ]]; then
-    ok "Shellman completion file present"
+    grep -q '_shellman()' "$dst" && ok "Shellman completion file present" || warn "Completion file present but not valid"
   else
     warn "Shellman completion file missing"
     if $FIX_MODE && [[ -f "$SHELLMAN_HOME/contrib/shellman_completion.bash" ]]; then
+      normalize_line_endings "$SHELLMAN_HOME/contrib/shellman_completion.bash"
       sudo cp "$SHELLMAN_HOME/contrib/shellman_completion.bash" "$dst" && ok "Completion file installed → $dst"
     fi
   fi
 }
+
+normalize_line_endings() {
+  local file="$1"
+  if file "$file" | grep -q "CRLF"; then
+    sed -i 's/\r$//' "$file" && ok "Normalized line endings to LF: $file"
+  fi
+}
+
+
 ensure_completion_loaded() {
   local line='[[ -f /etc/bash_completion.d/shellman_completion.bash ]] && source /etc/bash_completion.d/shellman_completion.bash'
   grep -Fxq "$line" ~/.bashrc || echo "$line" >> ~/.bashrc
@@ -261,4 +278,3 @@ check_remote_version
 ensure_user_bin_path
 
 $FIX_MODE && echo -e "\n🛠️  Fix mode: repairs applied where possible.\n"
- 
