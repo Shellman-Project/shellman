@@ -1,16 +1,20 @@
-import click
-import re
 import os
+import re
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
-@click.command(help="""Counts lines in files or folders with filtering options.
+import click
+
+
+@click.command(
+    help="""Counts lines in files or folders with filtering options.
 
 Examples:
   shellman count_lines logs --contains error --ext log --output
   shellman count_lines . --regex "TODO|FIXME" --ignore-case --summary --percent
-""")
+"""
+)
 @click.argument("inputs", nargs=-1, type=click.Path(exists=True))
 @click.option("--contains", help="Count lines containing this text")
 @click.option("--regex", help="Count lines matching regex pattern")
@@ -21,7 +25,18 @@ Examples:
 @click.option("--output", is_flag=True, help="Save results to logs/ folder")
 @click.option("--interactive", is_flag=True, help="View results interactively")
 @click.option("--show-size", is_flag=True, help="Show file size")
-def cli(inputs, contains, regex, ignore_case, ext, summary, percent, output, interactive, show_size):
+def cli(
+    inputs,
+    contains,
+    regex,
+    ignore_case,
+    ext,
+    summary,
+    percent,
+    output,
+    interactive,
+    show_size,
+):
     if contains and regex:
         click.echo("Use either --contains or --regex, not both.", err=True)
         sys.exit(1)
@@ -59,7 +74,11 @@ def cli(inputs, contains, regex, ignore_case, ext, summary, percent, output, int
 
         for line in lines:
             if contains:
-                if (contains.lower() in line.lower()) if ignore_case else (contains in line):
+                if (
+                    (contains.lower() in line.lower())
+                    if ignore_case
+                    else (contains in line)
+                ):
                     matched_lines += 1
             elif pattern:
                 if pattern.search(line):

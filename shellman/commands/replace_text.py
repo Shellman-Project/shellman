@@ -1,13 +1,17 @@
-import click
+import difflib
 import os
 from pathlib import Path
-import difflib
 
-@click.command(help="""Replaces text in multiple files with optional preview and confirmation.
+import click
+
+
+@click.command(
+    help="""Replaces text in multiple files with optional preview and confirmation.
 
 Examples:
   shellman replace_text ./docs --find old --replace new --ext md --in-place --preview
-""")
+"""
+)
 @click.argument("search_path", type=click.Path(exists=True, file_okay=False))
 @click.option("--find", "find_text", required=True, help="Text to find")
 @click.option("--replace", "replace_text", required=True, help="Text to replace with")
@@ -50,7 +54,7 @@ def cli(search_path, find_text, replace_text, ext, in_place, preview, confirm):
                 modified.splitlines(),
                 fromfile=str(file),
                 tofile=f"{file} (modified)",
-                lineterm=""
+                lineterm="",
             )
             for line in diff:
                 click.echo(line)
@@ -70,4 +74,3 @@ def cli(search_path, find_text, replace_text, ext, in_place, preview, confirm):
                     click.secho(f"Failed to write {file}: {e}", fg="red")
             else:
                 click.secho(f"Skipped: {file}", fg="yellow")
-                

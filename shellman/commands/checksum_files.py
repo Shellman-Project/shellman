@@ -1,7 +1,8 @@
-import click
 import hashlib
 import os
 from pathlib import Path
+
+import click
 
 SUPPORTED_ALGOS = {
     "sha256": hashlib.sha256,
@@ -9,17 +10,33 @@ SUPPORTED_ALGOS = {
     "sha1": hashlib.sha1,
 }
 
-@click.command(help="""Creates or verifies checksums for files in a directory.
+
+@click.command(
+    help="""Creates or verifies checksums for files in a directory.
 
 Examples:
   shellman checksum_files --path ./dist --ext zip --algo sha256 --out builds.sha256sum
   shellman checksum_files --verify --out builds.sha256sum
-""")
-@click.option("--path", "scan_path", type=click.Path(exists=True, file_okay=False), default=".", help="Directory to scan")
+"""
+)
+@click.option(
+    "--path",
+    "scan_path",
+    type=click.Path(exists=True, file_okay=False),
+    default=".",
+    help="Directory to scan",
+)
 @click.option("--ext", "ext_filter", help="Only include files with this extension")
-@click.option("--algo", type=click.Choice(["sha256", "md5", "sha1"]), default="sha256", help="Hash algorithm")
+@click.option(
+    "--algo",
+    type=click.Choice(["sha256", "md5", "sha1"]),
+    default="sha256",
+    help="Hash algorithm",
+)
 @click.option("--out", "out_file", type=click.Path(), help="Output list file name")
-@click.option("--verify", is_flag=True, help="Verify instead of generate (reads --out list)")
+@click.option(
+    "--verify", is_flag=True, help="Verify instead of generate (reads --out list)"
+)
 def cli(scan_path, ext_filter, algo, out_file, verify):
     scan_path = Path(scan_path)
     if not out_file:
@@ -60,7 +77,11 @@ def cli(scan_path, ext_filter, algo, out_file, verify):
         return
 
     # Generate checksums
-    files = [f for f in scan_path.rglob("*") if f.is_file() and (not ext_filter or f.suffix == f".{ext_filter}")]
+    files = [
+        f
+        for f in scan_path.rglob("*")
+        if f.is_file() and (not ext_filter or f.suffix == f".{ext_filter}")
+    ]
 
     if not files:
         click.echo("No files matched.")
@@ -73,6 +94,7 @@ def cli(scan_path, ext_filter, algo, out_file, verify):
             f.write(f"{checksum}  {file}\n")
 
     click.echo("✅ Done.")
+
 
 def hash_file(file_path, hash_func):
     h = hash_func()

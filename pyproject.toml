@@ -17,3 +17,17 @@ shellman = "shellman.cli:cli"
 
 [tool.setuptools]
 packages = ["shellman"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"  # lub twój Python
+
+[tool.ruff.lint]
+select = ["I", "F", "E", "W"]  # I = isort-style import sortowanie
+fixable = ["I"]                # naprawialne: importy
+ignore = []                    # możesz ignorować kody np. ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true

@@ -20,3 +20,9 @@ tests/__pycache__/test_replace_text.cpython-313-pytest-8.3.5.pyc
 tests/__pycache__/test_sys_summary.cpython-313-pytest-8.3.5.pyc
 shellman/__pycache__/
 tests/__pycache__/
+tests/__pycache__/test_find_files.cpython-313-pytest-8.3.5.pyc
+tests/__pycache__/test_encrypt_files.cpython-313-pytest-8.3.5.pyc
+tests/__pycache__/test_clean_files.cpython-313-pytest-8.3.5.pyc
+tests/__pycache__/test_find_files.cpython-313-pytest-8.3.5.pyc
+tests/__pycache__/test_encrypt_files.cpython-313-pytest-8.3.5.pyc
+tests/__pycache__/test_find_files.cpython-313-pytest-8.3.5.pyc

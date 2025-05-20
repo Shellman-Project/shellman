@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-import sys
 import json
-import yaml
+import sys
+
 import toml
+import yaml
 
 args = sys.argv[1:]
 if len(args) < 3:
@@ -11,8 +12,8 @@ if len(args) < 3:
 in_path, fmt_in, fmt_out = args[0], args[1].lower(), args[2].lower()
 pretty = "--pretty" in args
 
-# -------- load -------- 
-with open(in_path, 'r') as f:
+# -------- load --------
+with open(in_path, "r") as f:
     raw = f.read()
 
 if fmt_in == "json":
@@ -26,7 +27,9 @@ else:
 
 # -------- save --------
 if fmt_out == "json":
-    kwargs = {"indent": 2, "ensure_ascii": False} if pretty else {"separators": (",", ":")}
+    kwargs = (
+        {"indent": 2, "ensure_ascii": False} if pretty else {"separators": (",", ":")}
+    )
     print(json.dumps(data, **kwargs))
 elif fmt_out == "yaml":
     kwargs = {"indent": 2, "allow_unicode": True} if pretty else {}
