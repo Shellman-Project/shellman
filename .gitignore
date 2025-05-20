@@ -17,3 +17,6 @@ tests/__pycache__/test_checksum_files.cpython-313-pytest-8.3.5.pyc
 shellman/cli.py
 tests/__pycache__/test_file_convert.cpython-313-pytest-8.3.5.pyc
 tests/__pycache__/test_replace_text.cpython-313-pytest-8.3.5.pyc
+tests/__pycache__/test_sys_summary.cpython-313-pytest-8.3.5.pyc
+shellman/__pycache__/
+tests/__pycache__/
