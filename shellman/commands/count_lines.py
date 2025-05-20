@@ -5,7 +5,12 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
-@click.command()
+@click.command(help="""Counts lines in files or folders with filtering options.
+
+Examples:
+  shellman count_lines logs --contains error --ext log --output
+  shellman count_lines . --regex "TODO|FIXME" --ignore-case --summary --percent
+""")
 @click.argument("inputs", nargs=-1, type=click.Path(exists=True))
 @click.option("--contains", help="Count lines containing this text")
 @click.option("--regex", help="Count lines matching regex pattern")
@@ -17,7 +22,6 @@ from datetime import datetime
 @click.option("--interactive", is_flag=True, help="View results interactively")
 @click.option("--show-size", is_flag=True, help="Show file size")
 def cli(inputs, contains, regex, ignore_case, ext, summary, percent, output, interactive, show_size):
-    """Counts lines in files or folders with filtering options."""
     if contains and regex:
         click.echo("Use either --contains or --regex, not both.", err=True)
         sys.exit(1)
@@ -101,4 +105,3 @@ def cli(inputs, contains, regex, ignore_case, ext, summary, percent, output, int
         pager = os.environ.get("PAGER", "less")
         click.echo("\n(Showing result interactively...)\n")
         click.echo_via_pager(final_output)
-        
