@@ -1,5 +1,5 @@
 import click
-from .commands import count_lines, file_stats, find_files, checksum_files, clean_files, file_convert
+from .commands import count_lines, file_stats, find_files, checksum_files, clean_files, file_convert, replace_text
 
 VERSION = open("VERSION").read().strip()
 
@@ -15,4 +15,4 @@ cli.add_command(find_files.cli, name="find_files")
 cli.add_command(checksum_files.cli, name="checksum_files")
 cli.add_command(clean_files.cli, name="clean_files")
 cli.add_command(file_convert.cli, name="file_convert")
-
+cli.add_command(replace_text.cli, name="replace_text")
