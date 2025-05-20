@@ -1,5 +1,17 @@
 import click
-from .commands import extract_lines ,count_lines, file_stats, find_files, checksum_files, clean_files, file_convert, replace_text, encrypt_files, sys_summary, change_line_end
+from .commands import (
+    change_line_end,
+    checksum_files,
+    clean_files,
+    count_lines,
+    encrypt_files,
+    extract_lines,
+    file_convert,
+    file_stats,
+    find_files,
+    replace_text,
+    sys_summary,
+)
 
 VERSION = open("VERSION").read().strip()
 

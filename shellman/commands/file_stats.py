@@ -1,17 +1,23 @@
-import click
 import os
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
-@click.command(help="""Shows full path, file size, number of lines, and extension for each file.
+import click
+
+
+@click.command(
+    help="""Shows full path, file size, number of lines, and extension for each file.
 
 Examples:
   shellman file_stats myfile.txt
   shellman file_stats ./src --ext py --output
-""")
+"""
+)
 @click.argument("inputs", nargs=-1, type=click.Path(exists=True))
 @click.option("--ext", help="Only include files with this extension")
-@click.option("--output", is_flag=True, help="Save results to logs/file_stats_<timestamp>.log")
+@click.option(
+    "--output", is_flag=True, help="Save results to logs/file_stats_<timestamp>.log"
+)
 def cli(inputs, ext, output):
     if not inputs:
         click.echo("No files or directories provided.", err=True)
@@ -38,7 +44,9 @@ def cli(inputs, ext, output):
     results = []
     for file in all_files:
         try:
-            line_count = sum(1 for _ in file.open("r", encoding="utf-8", errors="ignore"))
+            line_count = sum(
+                1 for _ in file.open("r", encoding="utf-8", errors="ignore")
+            )
         except Exception as e:
             line_count = f"Error: {e}"
 

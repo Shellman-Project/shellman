@@ -1,19 +1,43 @@
-import click
-from pathlib import Path
 import os
+from pathlib import Path
 
-@click.command(help="""Convert or check line endings in files (LF ↔ CRLF).
+import click
+
+
+@click.command(
+    help="""Convert or check line endings in files (LF ↔ CRLF).
 
 Examples:
   shellman line_endings --file script.sh --to lf
   shellman line_endings --dir src --ext .txt --to crlf
   shellman line_endings --dir src --check
-""")
-@click.option("--file", "file_path", type=click.Path(exists=True, dir_okay=False), help="Path to a single file")
-@click.option("--dir", "dir_path", type=click.Path(exists=True, file_okay=False), help="Path to directory (will recurse)")
+"""
+)
+@click.option(
+    "--file",
+    "file_path",
+    type=click.Path(exists=True, dir_okay=False),
+    help="Path to a single file",
+)
+@click.option(
+    "--dir",
+    "dir_path",
+    type=click.Path(exists=True, file_okay=False),
+    help="Path to directory (will recurse)",
+)
 @click.option("--ext", help="Only process files with this extension (requires --dir)")
-@click.option("--to", "target", type=click.Choice(["lf", "crlf"]), help="Convert to specified line endings")
-@click.option("--check", "check_mode", is_flag=True, help="Only check and report line ending type per file")
+@click.option(
+    "--to",
+    "target",
+    type=click.Choice(["lf", "crlf"]),
+    help="Convert to specified line endings",
+)
+@click.option(
+    "--check",
+    "check_mode",
+    is_flag=True,
+    help="Only check and report line ending type per file",
+)
 def cli(file_path, dir_path, ext, target, check_mode):
     if not check_mode and not target:
         raise click.UsageError("Either --to or --check is required")
@@ -26,7 +50,11 @@ def cli(file_path, dir_path, ext, target, check_mode):
     elif dir_path:
         ext = ext.lstrip(".") if ext else None
         path_obj = Path(dir_path)
-        files = [f for f in path_obj.rglob("*") if f.is_file() and (not ext or f.suffix == f".{ext}")]
+        files = [
+            f
+            for f in path_obj.rglob("*")
+            if f.is_file() and (not ext or f.suffix == f".{ext}")
+        ]
 
     for f in files:
         if check_mode:
@@ -34,6 +62,7 @@ def cli(file_path, dir_path, ext, target, check_mode):
             click.echo(f"🔍 {f} → {ending}")
         else:
             convert_endings(f, target)
+
 
 def detect_endings(path: Path) -> str:
     try:
@@ -48,6 +77,7 @@ def detect_endings(path: Path) -> str:
         return "NONE"
     except Exception:
         return "ERROR"
+
 
 def convert_endings(path: Path, to: str):
     try:

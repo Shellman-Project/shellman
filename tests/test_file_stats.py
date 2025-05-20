@@ -1,9 +1,12 @@
+import os
+import tempfile
+from pathlib import Path
+
 import pytest
 from click.testing import CliRunner
+
 from shellman.commands.file_stats import cli
-import tempfile
-import os
-from pathlib import Path
+
 
 def write_temp_file(content, suffix=".txt"):
     tf = tempfile.NamedTemporaryFile(delete=False, mode="w+", suffix=suffix)
@@ -11,6 +14,7 @@ def write_temp_file(content, suffix=".txt"):
     tf.flush()
     tf.close()
     return tf.name
+
 
 def test_file_stats_basic():
     path = write_temp_file("a\nb\nc\n")
@@ -20,6 +24,7 @@ def test_file_stats_basic():
     assert "Lines: 3" in result.output
     assert "Size:" in result.output
     assert "Extension:" in result.output
+
 
 def test_file_stats_with_ext_filter(tmp_path):
     (tmp_path / "a.txt").write_text("line\n")

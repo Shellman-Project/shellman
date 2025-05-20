@@ -1,5 +1,7 @@
 from click.testing import CliRunner
+
 from shellman.commands.sys_summary import cli
+
 
 def test_sys_summary_output_contains_sections():
     runner = CliRunner()

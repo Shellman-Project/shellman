@@ -1,18 +1,32 @@
-import click
 import os
-from pathlib import Path
 from datetime import datetime, timedelta
+from pathlib import Path
 
-@click.command(help="""Deletes unwanted files (by name, extension or age).
+import click
+
+
+@click.command(
+    help="""Deletes unwanted files (by name, extension or age).
 
 Examples:
   shellman clean_files --ext tmp --older-than 7 --dry-run
   shellman clean_files --path ./build --name '~' --confirm
-""")
-@click.option("--path", "scan_path", type=click.Path(exists=True, file_okay=False), default=".", help="Directory to scan")
+"""
+)
+@click.option(
+    "--path",
+    "scan_path",
+    type=click.Path(exists=True, file_okay=False),
+    default=".",
+    help="Directory to scan",
+)
 @click.option("--ext", "ext_filter", help="Delete files with this extension")
-@click.option("--name", "name_filter", help="Delete files whose name contains this pattern")
-@click.option("--older-than", "age_days", type=int, help="Delete only files older than N days")
+@click.option(
+    "--name", "name_filter", help="Delete files whose name contains this pattern"
+)
+@click.option(
+    "--older-than", "age_days", type=int, help="Delete only files older than N days"
+)
 @click.option("--dry-run", is_flag=True, help="Preview: list files but do NOT delete")
 @click.option("--confirm", is_flag=True, help="Ask Y/n before deleting each file")
 def cli(scan_path, ext_filter, name_filter, age_days, dry_run, confirm):

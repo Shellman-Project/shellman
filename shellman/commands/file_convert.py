@@ -1,23 +1,46 @@
-import click
 import json
-import yaml
-import toml
-from pathlib import Path
-import sys
 import os
+import sys
+from pathlib import Path
 
-@click.command(help="""Converts between JSON, YAML, and TOML formats.
+import click
+import toml
+import yaml
+
+
+@click.command(
+    help="""Converts between JSON, YAML, and TOML formats.
 
 Examples:
   shellman file_convert config.json --from json --to yaml
   shellman file_convert config.toml --from toml --to json --pretty --output out.json
-""")
+"""
+)
 @click.argument("file", type=click.Path(exists=True, dir_okay=False))
-@click.option("--from", "from_format", required=True, type=click.Choice(["json", "yaml", "toml"]), help="Input format")
-@click.option("--to", "to_format", required=True, type=click.Choice(["json", "yaml", "toml"]), help="Output format")
-@click.option("--output", "output_file", type=click.Path(), help="Save to file instead of stdout")
+@click.option(
+    "--from",
+    "from_format",
+    required=True,
+    type=click.Choice(["json", "yaml", "toml"]),
+    help="Input format",
+)
+@click.option(
+    "--to",
+    "to_format",
+    required=True,
+    type=click.Choice(["json", "yaml", "toml"]),
+    help="Output format",
+)
+@click.option(
+    "--output", "output_file", type=click.Path(), help="Save to file instead of stdout"
+)
 @click.option("--pretty", is_flag=True, help="Pretty print output (if supported)")
-@click.option("--interactive", is_flag=True, default=False, help="Pipe output to less (if no --output)")
+@click.option(
+    "--interactive",
+    is_flag=True,
+    default=False,
+    help="Pipe output to less (if no --output)",
+)
 def cli(file, from_format, to_format, output_file, pretty, interactive):
     path = Path(file)
 
@@ -37,7 +60,11 @@ def cli(file, from_format, to_format, output_file, pretty, interactive):
 
     # Convert
     if to_format == "json":
-        kwargs = {"indent": 2, "ensure_ascii": False} if pretty else {"separators": (",", ":")}
+        kwargs = (
+            {"indent": 2, "ensure_ascii": False}
+            if pretty
+            else {"separators": (",", ":")}
+        )
         result = json.dumps(data, **kwargs)
     elif to_format == "yaml":
         kwargs = {"indent": 2, "allow_unicode": True} if pretty else {}

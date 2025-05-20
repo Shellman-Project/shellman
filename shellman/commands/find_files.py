@@ -1,20 +1,28 @@
-import click
 import os
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
-@click.command(help="""Finds files by partial name, extension, or matching content.
+import click
+
+
+@click.command(
+    help="""Finds files by partial name, extension, or matching content.
 
 Examples:
   shellman find_files . --name log
   shellman find_files ./docs --content "error 404" --ext md
   shellman find_files ./src --name util --output --show-size
-""")
+"""
+)
 @click.argument("search_path", type=click.Path(exists=True, file_okay=False))
 @click.option("--name", "name_filter", help="Match filenames containing this fragment")
-@click.option("--content", "content_filter", help="Search for files containing this text")
+@click.option(
+    "--content", "content_filter", help="Search for files containing this text"
+)
 @click.option("--ext", "ext_filter", help="Only include files with this extension")
-@click.option("--output", is_flag=True, help="Save results to logs/find_files_<timestamp>.log")
+@click.option(
+    "--output", is_flag=True, help="Save results to logs/find_files_<timestamp>.log"
+)
 @click.option("--show-size", is_flag=True, help="Show file size next to each result")
 def cli(search_path, name_filter, content_filter, ext_filter, output, show_size):
     path = Path(search_path)
@@ -33,7 +41,9 @@ def cli(search_path, name_filter, content_filter, ext_filter, output, show_size)
             continue
         if content_filter:
             try:
-                if content_filter not in file.read_text(encoding="utf-8", errors="ignore"):
+                if content_filter not in file.read_text(
+                    encoding="utf-8", errors="ignore"
+                ):
                     continue
             except Exception:
                 continue

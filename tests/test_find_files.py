@@ -1,8 +1,11 @@
-from shellman.commands.find_files import cli
-from click.testing import CliRunner
-import tempfile
 import os
+import tempfile
 from pathlib import Path
+
+from click.testing import CliRunner
+
+from shellman.commands.find_files import cli
+
 
 def test_find_by_name(tmp_path):
     (tmp_path / "file_log.txt").write_text("some content")
@@ -12,6 +15,7 @@ def test_find_by_name(tmp_path):
     assert "file_log.txt" in result.output
     assert "data.txt" not in result.output
 
+
 def test_find_by_content(tmp_path):
     (tmp_path / "a.txt").write_text("hello world")
     (tmp_path / "b.txt").write_text("no match here")
@@ -20,6 +24,7 @@ def test_find_by_content(tmp_path):
     assert "a.txt" in result.output
     assert "b.txt" not in result.output
 
+
 def test_find_by_ext_and_size(tmp_path):
     file = tmp_path / "script.sh"
     file.write_text("echo test\n")
@@ -27,6 +32,7 @@ def test_find_by_ext_and_size(tmp_path):
     result = runner.invoke(cli, [str(tmp_path), "--ext", "sh", "--show-size"])
     assert "script.sh" in result.output
     assert "[" in result.output  # file size indicator
+
 
 def test_find_nothing(tmp_path):
     (tmp_path / "a.txt").write_text("irrelevant")
