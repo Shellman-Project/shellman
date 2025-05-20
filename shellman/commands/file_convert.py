@@ -4,6 +4,7 @@ import yaml
 import toml
 from pathlib import Path
 import sys
+import os
 
 @click.command(help="""Converts between JSON, YAML, and TOML formats.
 
