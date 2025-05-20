@@ -1,5 +1,5 @@
 import click
-from .commands import count_lines, file_stats, find_files, checksum_files, clean_files, file_convert, replace_text, encrypt_files, sys_summary, change_line_end
+from .commands import extract_lines ,count_lines, file_stats, find_files, checksum_files, clean_files, file_convert, replace_text, encrypt_files, sys_summary, change_line_end
 
 VERSION = open("VERSION").read().strip()
 
@@ -19,3 +19,4 @@ cli.add_command(replace_text.cli, name="replace_text")
 cli.add_command(encrypt_files.cli, name="encrypt_files")
 cli.add_command(sys_summary.cli, name="sys_summary")
 cli.add_command(change_line_end.cli, name="change_line_end")
+cli.add_command(extract_lines.cli, name="extract_lines")
