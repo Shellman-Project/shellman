@@ -5,7 +5,11 @@ description = "Your friendly shell assistant"
 authors = [{name = "Jakub Marciniak", email = "jakub.marciniak.app@gmail.com"}]
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = ["click"]
+dependencies = [
+    "click",
+    "pyyaml",
+    "toml"
+]
 
 [project.scripts]
 shellman = "shellman.cli:cli"
