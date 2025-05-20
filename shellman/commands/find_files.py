@@ -3,7 +3,13 @@ import os
 from pathlib import Path
 from datetime import datetime
 
-@click.command()
+@click.command(help="""Finds files by partial name, extension, or matching content.
+
+Examples:
+  shellman find_files . --name log
+  shellman find_files ./docs --content "error 404" --ext md
+  shellman find_files ./src --name util --output --show-size
+""")
 @click.argument("search_path", type=click.Path(exists=True, file_okay=False))
 @click.option("--name", "name_filter", help="Match filenames containing this fragment")
 @click.option("--content", "content_filter", help="Search for files containing this text")
@@ -11,7 +17,6 @@ from datetime import datetime
 @click.option("--output", is_flag=True, help="Save results to logs/find_files_<timestamp>.log")
 @click.option("--show-size", is_flag=True, help="Show file size next to each result")
 def cli(search_path, name_filter, content_filter, ext_filter, output, show_size):
-    """Finds files by partial name, extension, or matching content."""
     path = Path(search_path)
     if not path.is_dir():
         click.echo(f"Path is not a directory: {search_path}", err=True)

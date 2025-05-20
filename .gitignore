@@ -13,3 +13,4 @@ tests/__pycache__/test_count_lines.cpython-313-pytest-8.3.5.pyc
 tests/__pycache__/test_file_stats.cpython-313-pytest-8.3.5.pyc
 shellman/__pycache__/cli.cpython-313.pyc
 shellman/__pycache__/__init__.cpython-313.pyc
+tests/__pycache__/test_checksum_files.cpython-313-pytest-8.3.5.pyc
