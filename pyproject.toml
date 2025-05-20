@@ -1,0 +1,14 @@
+[project]
+name = "shellman"
+version = "0.8.2"
+description = "Your friendly shell assistant"
+authors = [{name = "Jakub Marciniak", email = "jakub.marciniak.app@gmail.com"}]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = ["click"]
+
+[project.scripts]
+shellman = "shellman.cli:cli"
+
+[tool.setuptools]
+packages = ["shellman"]
