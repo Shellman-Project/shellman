@@ -18,6 +18,7 @@ from .commands import (
     json_extract,
     date_utils,
     merge_files,
+    zip_batch,
 )
 
 VERSION = open("VERSION").read().strip()
@@ -46,3 +47,4 @@ cli.add_command(csv_extract.cli, name="csv_extract")
 cli.add_command(json_extract.cli, name="json_extract")
 cli.add_command(date_utils.cli, name="date_utils")
 cli.add_command(merge_files.cli, name="merge_files")
+cli.add_command(zip_batch.cli, name="zip_batch")
