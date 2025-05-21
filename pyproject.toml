@@ -9,7 +9,8 @@ dependencies = [
     "click",
     "pyyaml",
     "toml",
-    "cryptography"
+    "cryptography",
+    "openpyxl"
 ]
 
 [project.scripts]

@@ -1,7 +1,7 @@
 logs/
 tmp/
 
-# IDE/OS temp files
+# IDE/OS temp files 
 .DS_Store
 *.swp
 *.bak
@@ -27,6 +27,9 @@ tests/__pycache__/test_find_files.cpython-313-pytest-8.3.5.pyc
 tests/__pycache__/test_encrypt_files.cpython-313-pytest-8.3.5.pyc
 tests/__pycache__/test_find_files.cpython-313-pytest-8.3.5.pyc
 tests/__pycache__/test_clean_files.cpython-313-pytest-8.3.5.pyc
+tests/__pycache__/test_clean_files.cpython-313-pytest-8.3.5.pyc
+tests/__pycache__/test_encrypt_files.cpython-313-pytest-8.3.5.pyc
+tests/__pycache__/test_find_files.cpython-313-pytest-8.3.5.pyc
 tests/__pycache__/test_clean_files.cpython-313-pytest-8.3.5.pyc
 tests/__pycache__/test_encrypt_files.cpython-313-pytest-8.3.5.pyc
 tests/__pycache__/test_find_files.cpython-313-pytest-8.3.5.pyc
