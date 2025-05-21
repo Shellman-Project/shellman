@@ -10,7 +10,8 @@ dependencies = [
     "pyyaml",
     "toml",
     "cryptography",
-    "openpyxl"
+    "openpyxl",
+    "python-dateutil",
 ]
 
 [project.scripts]
