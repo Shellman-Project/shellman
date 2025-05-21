@@ -12,6 +12,7 @@ from .commands import (
     replace_text,
     sys_summary,
     excel_info,
+    excel_to_csv
 )
 
 VERSION = open("VERSION").read().strip()
@@ -34,3 +35,4 @@ cli.add_command(sys_summary.cli, name="sys_summary")
 cli.add_command(change_line_end.cli, name="change_line_end")
 cli.add_command(extract_lines.cli, name="extract_lines")
 cli.add_command(excel_info.cli, name="excel_info")
+cli.add_command(excel_to_csv.cli, name="excel_to_csv")
