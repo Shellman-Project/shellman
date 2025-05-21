@@ -1,0 +1,35 @@
+[project]
+name = "shellman"
+version = "0.8.2"
+description = "Your friendly shell assistant"
+authors = [{name = "Jakub Marciniak", email = "jakub.marciniak.app@gmail.com"}]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "click",
+    "pyyaml",
+    "toml",
+    "cryptography",
+    "openpyxl",
+    "python-dateutil",
+]
+
+[project.scripts]
+shellman = "shellman.cli:cli"
+
+[tool.setuptools]
+packages = ["shellman"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"  # lub twój Python
+
+[tool.ruff.lint]
+select = ["I", "F", "E", "W"]  # I = isort-style import sortowanie
+fixable = ["I"]                # naprawialne: importy
+ignore = []                    # możesz ignorować kody np. ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
