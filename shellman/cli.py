@@ -11,6 +11,7 @@ from .commands import (
     find_files,
     replace_text,
     sys_summary,
+    excel_info,
 )
 
 VERSION = open("VERSION").read().strip()
@@ -32,3 +33,4 @@ cli.add_command(encrypt_files.cli, name="encrypt_files")
 cli.add_command(sys_summary.cli, name="sys_summary")
 cli.add_command(change_line_end.cli, name="change_line_end")
 cli.add_command(extract_lines.cli, name="extract_lines")
+cli.add_command(excel_info.cli, name="excel_info")
