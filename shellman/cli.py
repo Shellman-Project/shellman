@@ -15,6 +15,7 @@ from .commands import (
     excel_to_csv,
     excel_preview,
     csv_extract,
+    json_extract,
 )
 
 VERSION = open("VERSION").read().strip()
@@ -40,3 +41,4 @@ cli.add_command(excel_info.cli, name="excel_info")
 cli.add_command(excel_to_csv.cli, name="excel_to_csv")
 cli.add_command(excel_preview.cli, name="excel_preview")
 cli.add_command(csv_extract.cli, name="csv_extract")
+cli.add_command(json_extract.cli, name="json_extract")
