@@ -1,12 +1,13 @@
 # shellman/commands/open_ports.py
 """
 List currently open TCP / UDP ports with process name, PID and state.
-Works on Linux, macOS and Windows.  Requires `psutil`; installs it lazily.
+Works on Linux, macOS and Windows.  Requires `psutil`.
 """
 from pathlib import Path
 import subprocess
 import sys
 import shutil
+import socket
 import importlib.resources
 import json as _json
 
@@ -21,25 +22,27 @@ import click
 @click.option("--json", "json_out", is_flag=True, help="Output raw JSON")
 @click.option("--lang-help", "lang", help="Show localized help (pl, eng)")
 def cli(proto, port, json_out, lang):
-    # ---------- localized help ---------- #
     if lang:
         _print_help_md(lang)
         return
 
-    # ---------- ensure psutil ---------- #
+    # ensure psutil
     try:
-        import psutil  # noqa: E402
+        import psutil
     except ModuleNotFoundError:
         click.echo("Installing psutil...", err=True)
-        subprocess.check_call(
-            [sys.executable, "-m", "pip", "install", "--quiet", "psutil"]
-        )
-        import psutil  # noqa: E402
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "--quiet", "psutil"])
+        import psutil
 
     conns = psutil.net_connections(kind="inet")
     result = []
     for c in conns:
-        proto_name = "tcp" if c.type == psutil.SOCK_STREAM else "udp"
+        proto_name = "tcp" if c.type == socket.SOCK_STREAM else "udp"
+        if proto and proto_name != proto:
+            continue
+        if port and (c.laddr and c.laddr.port != port):
+            continue
+
         laddr = f"{c.laddr.ip}:{c.laddr.port}" if c.laddr else ""
         raddr = f"{c.raddr.ip}:{c.raddr.port}" if c.raddr else ""
         entry = {
@@ -50,10 +53,6 @@ def cli(proto, port, json_out, lang):
             "remote": raddr,
             "state": getattr(c, "status", ""),
         }
-        if proto and entry["proto"] != proto:
-            continue
-        if port and (c.laddr and c.laddr.port != port):
-            continue
         result.append(entry)
 
     if json_out:
@@ -64,7 +63,6 @@ def cli(proto, port, json_out, lang):
         click.echo("No matching open ports.")
         return
 
-    # human-readable table
     hdr = f"{'Proto':<4} {'PID':>6} {'Process':<18} {'Local':<22} {'Remote':<22} State"
     click.echo(hdr)
     click.echo("-" * len(hdr))
@@ -79,13 +77,12 @@ def _proc_name(pid):
     if pid is None:
         return "-"
     try:
-        import psutil  # noqa: E402
+        import psutil
         return psutil.Process(pid).name()
     except Exception:
         return "?"
 
 
-# ---------- Markdown help loader ---------- #
 def _print_help_md(lang="eng"):
     lang_file = f"help_{lang.lower()}.md"
     try:
