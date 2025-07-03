@@ -11,6 +11,7 @@ Show the first *N* rows and selected columns of a worksheet.
 | `--columns`  | ―    | Column letters, e.g. `A,C-E` |
 | `--output`   | ―    | Save preview to CSV file |
 | `--interactive` | ✗ | Pipe output to `less -S` |
+| `--info` / `-i`  | ✗ | **Add a header line with column letters + widths, prepend row numbers, and display cells separated by ` | ` instead of commas** |
 
 ### 📦 Examples
 first 10 rows, columns A & B
