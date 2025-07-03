@@ -1,15 +1,15 @@
-import click
 import csv
 from pathlib import Path
+import importlib.resources
 
-@click.command(help="""Extracts selected columns or rows from a CSV file.
+import click
 
-Examples:
-  shellman csv_extract data.csv --cols 1,4 --rows 2-100 --skip-header
-  shellman csv_extract logs.csv --contains ERROR --output errors.csv --interactive
-""")
-@click.argument("file", type=click.Path(exists=True, dir_okay=False))
-@click.option("--cols", required=True, help="Columns to keep (1-based), e.g. 1,3 or 2-4")
+
+@click.command(
+    help="Extracts specific columns or rows from a CSV file with filtering options."
+)
+@click.argument("file", required=False)
+@click.option("--cols", required=False, help="Columns to keep (1-based), e.g. 1,3 or 2-4")
 @click.option("--rows", help="Rows to keep (after header), e.g. 2-10")
 @click.option("--contains", help="Only keep rows containing this text")
 @click.option("--not-contains", "not_contains", help="Only keep rows NOT containing this text")
@@ -17,7 +17,16 @@ Examples:
 @click.option("--skip-header", is_flag=True, default=False, help="Skip first line (header)")
 @click.option("--output", type=click.Path(), help="Save result instead of printing")
 @click.option("--interactive", is_flag=True, default=False, help="Pipe result to less")
-def cli(file, cols, rows, contains, not_contains, delim, skip_header, output, interactive):
+@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing the command")
+def cli(file, cols, rows, contains, not_contains, delim, skip_header, output, interactive, lang):
+    if lang:
+        print_help_md(lang)
+        return
+
+    if not file:
+        raise click.UsageError("Missing required argument 'file'")
+    if not cols:
+        raise click.UsageError("Missing required option '--cols'")
     if contains and not_contains:
         raise click.UsageError("Use --contains XOR --not-contains")
 
@@ -44,8 +53,7 @@ def cli(file, cols, rows, contains, not_contains, delim, skip_header, output, in
         for idx, row in enumerate(reader):
             if skip_header and idx == 0:
                 continue
-            row_number = idx if not skip_header else idx  # Adjusted already by skipping
-            if row_idxs and (row_number + 1) not in row_idxs:
+            if row_idxs and (idx + 1) not in row_idxs:
                 continue
 
             joined = delim.join(row).lower()
@@ -69,3 +77,13 @@ def cli(file, cols, rows, contains, not_contains, delim, skip_header, output, in
         click.echo(f"Lines printed: {len(result_lines)}")
         if interactive:
             click.echo_via_pager(output_text)
+
+
+def print_help_md(lang="eng"):
+    lang_file = f"help_{lang.lower()}.md"
+    try:
+        help_path = importlib.resources.files("shellman").joinpath(f"help_texts/csv_extract/{lang_file}")
+        content = help_path.read_text(encoding="utf-8")
+        click.echo(content)
+    except Exception:
+        click.echo(f"⚠️ Help not available for language: {lang}", err=True)
