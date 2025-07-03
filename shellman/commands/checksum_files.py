@@ -1,7 +1,6 @@
 import hashlib
-import os
 from pathlib import Path
-
+import importlib.resources
 import click
 
 SUPPORTED_ALGOS = {
@@ -11,33 +10,28 @@ SUPPORTED_ALGOS = {
 }
 
 
-@click.command(
-    help="""Creates or verifies checksums for files in a directory.
+def print_help_md(lang="eng"):
+    lang_file = f"help_{lang.lower()}.md"
+    try:
+        help_path = importlib.resources.files("shellman").joinpath(f"help_texts/checksum_files/{lang_file}")
+        content = help_path.read_text(encoding="utf-8")
+        click.echo(content)
+    except Exception:
+        click.echo(f"⚠️ Help not available for language: {lang}", err=True)
 
-Examples:
-  shellman checksum_files --path ./dist --ext zip --algo sha256 --out builds.sha256sum
-  shellman checksum_files --verify --out builds.sha256sum
-"""
-)
-@click.option(
-    "--path",
-    "scan_path",
-    type=click.Path(exists=True, file_okay=False),
-    default=".",
-    help="Directory to scan",
-)
+
+@click.command()
+@click.option("--path", "scan_path", type=click.Path(exists=True, file_okay=False), default=".", help="Directory to scan")
 @click.option("--ext", "ext_filter", help="Only include files with this extension")
-@click.option(
-    "--algo",
-    type=click.Choice(["sha256", "md5", "sha1"]),
-    default="sha256",
-    help="Hash algorithm",
-)
+@click.option("--algo", type=click.Choice(["sha256", "md5", "sha1"]), default="sha256", help="Hash algorithm")
 @click.option("--out", "out_file", type=click.Path(), help="Output list file name")
-@click.option(
-    "--verify", is_flag=True, help="Verify instead of generate (reads --out list)"
-)
-def cli(scan_path, ext_filter, algo, out_file, verify):
+@click.option("--verify", is_flag=True, help="Verify instead of generate (reads --out list)")
+@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing the command")
+def cli(scan_path, ext_filter, algo, out_file, verify, lang):
+    if lang:
+        print_help_md(lang)
+        return
+
     scan_path = Path(scan_path)
     if not out_file:
         out_file = f"checksums.{algo}sum"
