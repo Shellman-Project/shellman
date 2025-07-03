@@ -20,7 +20,9 @@ def print_help_md(lang="eng"):
         click.echo(f"⚠️ Help not available for language: {lang}", err=True)
 
 
-@click.command()
+@click.command(
+    help="Generate or verify checksums (SHA256, MD5, etc.) for files."
+)
 @click.option("--path", "scan_path", type=click.Path(exists=True, file_okay=False), default=".", help="Directory to scan")
 @click.option("--ext", "ext_filter", help="Only include files with this extension")
 @click.option("--algo", type=click.Choice(["sha256", "md5", "sha1"]), default="sha256", help="Hash algorithm")

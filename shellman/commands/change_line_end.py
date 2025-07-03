@@ -14,7 +14,9 @@ def print_help_md(lang="eng"):
         click.echo(f"⚠️ Help not available for language: {lang}", err=True)
 
 
-@click.command()
+@click.command(
+    help="Convert or check LF/CRLF line endings in files or folders."
+)
 @click.option("--file", "file_path", type=click.Path(exists=True, dir_okay=False), help="Path to a single file")
 @click.option("--dir", "dir_path", type=click.Path(exists=True, file_okay=False), help="Path to directory (will recurse)")
 @click.option("--ext", help="Only process files with this extension (requires --dir)")
