@@ -1,53 +1,49 @@
+from pathlib import Path
 import json
 import os
-import sys
-from pathlib import Path
+import importlib.resources
 
 import click
-import toml
 import yaml
+import toml
 
 
 @click.command(
-    help="""Converts between JSON, YAML, and TOML formats.
+    help="Convert between JSON, YAML and TOML formats."
+)
+@click.argument("file", required=False)
+@click.option("--from", "from_format",
+              required=False,
+              type=click.Choice(["json", "yaml", "toml"]),
+              help="Input format (required unless using --lang-help)")
 
-Examples:
-  shellman file_convert config.json --from json --to yaml
-  shellman file_convert config.toml --from toml --to json --pretty --output out.json
-"""
-)
-@click.argument("file", type=click.Path(exists=True, dir_okay=False))
-@click.option(
-    "--from",
-    "from_format",
-    required=True,
-    type=click.Choice(["json", "yaml", "toml"]),
-    help="Input format",
-)
-@click.option(
-    "--to",
-    "to_format",
-    required=True,
-    type=click.Choice(["json", "yaml", "toml"]),
-    help="Output format",
-)
-@click.option(
-    "--output", "output_file", type=click.Path(), help="Save to file instead of stdout"
-)
-@click.option("--pretty", is_flag=True, help="Pretty print output (if supported)")
-@click.option(
-    "--interactive",
-    is_flag=True,
-    default=False,
-    help="Pipe output to less (if no --output)",
-)
-def cli(file, from_format, to_format, output_file, pretty, interactive):
+@click.option("--to", "to_format",
+              required=False,
+              type=click.Choice(["json", "yaml", "toml"]),
+              help="Output format (required unless using --lang-help)")
+
+@click.option("--output", "output_file", type=click.Path(), help="Save to file instead of stdout")
+@click.option("--pretty", is_flag=True, help="Pretty-print output (where supported)")
+@click.option("--interactive", is_flag=True, help="Pipe output to less (if no --output)")
+@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing")
+def cli(file, from_format, to_format, output_file, pretty, interactive, lang):
+    # ---------- lokalizowana pomoc ---------- #
+    if lang:
+        _print_help_md(lang)
+        return
+
+    # ---------- walidacja ---------- #
+    if not file:
+        raise click.UsageError("Missing required argument 'file'")
+    if not from_format:
+        raise click.UsageError("Missing required option '--from'")
+    if not to_format:
+        raise click.UsageError("Missing required option '--to'")
+
     path = Path(file)
+    raw = path.read_text(encoding="utf-8")
 
-    with path.open("r", encoding="utf-8") as f:
-        raw = f.read()
-
-    # Load data
+    # ---------- parse input ---------- #
     if from_format == "json":
         data = json.loads(raw)
     elif from_format == "yaml":
@@ -55,16 +51,11 @@ def cli(file, from_format, to_format, output_file, pretty, interactive):
     elif from_format == "toml":
         data = toml.loads(raw)
     else:
-        click.echo(f"Unsupported input format: {from_format}", err=True)
-        raise click.Abort()
+        raise click.ClickException(f"Unsupported input format: {from_format}")
 
-    # Convert
+    # ---------- convert ---------- #
     if to_format == "json":
-        kwargs = (
-            {"indent": 2, "ensure_ascii": False}
-            if pretty
-            else {"separators": (",", ":")}
-        )
+        kwargs = {"indent": 2, "ensure_ascii": False} if pretty else {"separators": (",", ":")}
         result = json.dumps(data, **kwargs)
     elif to_format == "yaml":
         kwargs = {"indent": 2, "allow_unicode": True} if pretty else {}
@@ -72,13 +63,11 @@ def cli(file, from_format, to_format, output_file, pretty, interactive):
     elif to_format == "toml":
         result = toml.dumps(data)
     else:
-        click.echo(f"Unsupported output format: {to_format}", err=True)
-        raise click.Abort()
+        raise click.ClickException(f"Unsupported output format: {to_format}")
 
-    # Output
+    # ---------- output ---------- #
     if output_file:
-        with open(output_file, "w", encoding="utf-8") as f:
-            f.write(result)
+        Path(output_file).write_text(result, encoding="utf-8")
         click.echo(f"Saved to {output_file}")
         if interactive:
             os.system(f"less -S {output_file}")
@@ -86,3 +75,15 @@ def cli(file, from_format, to_format, output_file, pretty, interactive):
         click.echo_via_pager(result)
     else:
         click.echo(result)
+
+
+# ---------- Markdown help loader ---------- #
+def _print_help_md(lang: str = "eng"):
+    lang_file = f"help_{lang.lower()}.md"
+    try:
+        help_path = importlib.resources.files("shellman").joinpath(
+            f"help_texts/file_convert/{lang_file}"
+        )
+        click.echo(help_path.read_text(encoding="utf-8"))
+    except Exception:
+        click.echo(f"⚠️ Help not available for language: {lang}", err=True)
