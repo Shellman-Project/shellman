@@ -11,9 +11,7 @@ from .commands import (
     find_files,
     replace_text,
     sys_summary,
-    excel_info,
-    excel_to_csv,
-    excel_preview,
+    excel,
     csv_extract,
     json_extract,
     date_utils,
@@ -53,9 +51,7 @@ cli.add_command(encrypt_files.cli, name="encrypt_files")
 cli.add_command(sys_summary.cli, name="sys_summary")
 cli.add_command(change_line_end.cli, name="change_line_end")
 cli.add_command(extract_lines.cli, name="extract_lines")
-cli.add_command(excel_info.cli, name="excel_info")
-cli.add_command(excel_to_csv.cli, name="excel_to_csv")
-cli.add_command(excel_preview.cli, name="excel_preview")
+cli.add_command(excel.cli, name="excel")
 cli.add_command(csv_extract.cli, name="csv_extract")
 cli.add_command(json_extract.cli, name="json_extract")
 cli.add_command(date_utils.cli, name="date_utils")
