@@ -32,7 +32,14 @@ except Exception:
 @click.group()
 @click.version_option(version=VERSION)
 def cli():
-    """Shellman – your friendly shell assistant 💬"""
+    """Shellman – your friendly shell assistant 💬
+    
+    For command help in your lang:
+    shellman count_lines --lang-help pl
+    Available languages:
+    eng, pl
+
+    """
     pass
 
 cli.add_command(count_lines.cli, name="count_lines")
