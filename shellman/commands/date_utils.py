@@ -1,22 +1,24 @@
 import click
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
+import importlib.resources
 import re
 
-@click.command(help="""Work with dates: add/subtract time, compare or format.
 
-Examples:
-  shellman date_utils --add 5d
-  shellman date_utils --date "2024-12-01 13:00" --sub 2h
-  shellman date_utils --date "2024-01-01" --diff "2025-04-18 09:15:00"
-  shellman date_utils --format "%A, %d %B %Y, %T"
-""")
+@click.command(
+    help="Work with dates: add/subtract time, compare or format."
+)
 @click.option("--date", "base_date", help="Base date (default: now)", default=None)
 @click.option("--add", "add_input", help="Add duration (e.g. 5d, 3w, 2h, 10min)")
 @click.option("--sub", "sub_input", help="Subtract duration")
 @click.option("--diff", "diff_date", help="Date to compare to (diff mode)")
 @click.option("--format", "format_pattern", help="Format output using strftime")
-def cli(base_date, add_input, sub_input, diff_date, format_pattern):
+@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing the command")
+def cli(base_date, add_input, sub_input, diff_date, format_pattern, lang):
+    if lang:
+        print_help_md(lang)
+        return
+
     if base_date:
         try:
             dt = datetime.strptime(base_date, "%Y-%m-%d %H:%M:%S")
@@ -92,4 +94,13 @@ def cli(base_date, add_input, sub_input, diff_date, format_pattern):
             click.echo(f"→ result:  {result.strftime(format_pattern)}")
         else:
             click.echo(f"→ formatted: {dt.strftime(format_pattern)}")
-            
+
+
+def print_help_md(lang="eng"):
+    lang_file = f"help_{lang.lower()}.md"
+    try:
+        help_path = importlib.resources.files("shellman").joinpath(f"help_texts/date_utils/{lang_file}")
+        content = help_path.read_text(encoding="utf-8")
+        click.echo(content)
+    except Exception:
+        click.echo(f"⚠️ Help not available for language: {lang}", err=True)
