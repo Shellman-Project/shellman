@@ -22,7 +22,9 @@ def _print_help_md(sub: str, lang: str = "eng"):
         )
         click.echo(help_path.read_text(encoding="utf-8"))
     except Exception:
-        click.echo(f"⚠️ Help not available for '{sub}' in language '{lang}'.", err=True)
+        click.echo(
+            f"⚠️ Help not available for '{sub}' in language '{lang}'.", err=True
+        )
 
 
 # -------- main click group ------------------------------------------------- #
@@ -66,9 +68,20 @@ def info(file, lang):
 @click.option("--rows", default=20, type=int, help="Number of rows to preview")
 @click.option("--columns", help="Column letters (e.g. A,C-E)")
 @click.option("--output", type=click.Path(), help="Save result to CSV")
-@click.option("--interactive", is_flag=True, default=False, help="Pipe result to less -S")
+@click.option(
+    "--interactive",
+    is_flag=True,
+    default=False,
+    help="Pipe result to less -S",
+)
+@click.option(
+    "--info",
+    "-i",
+    is_flag=True,
+    help="Show column header + row numbers and use '|' separator",
+)
 @click.option("--lang-help", "lang", help="Show localized help (pl, eng)")
-def preview(file, sheet, rows, columns, output, interactive, lang):
+def preview(file, sheet, rows, columns, output, interactive, info, lang):
     if lang:
         _print_help_md("preview", lang)
         return
@@ -84,21 +97,25 @@ def preview(file, sheet, rows, columns, output, interactive, lang):
     except Exception:
         raise click.ClickException(f"Invalid sheet reference: {sheet}")
 
-    # parse column letters
-    def parse_spec(spec):
-        result = set()
+    # parse column letters like A,C-E
+    def parse_spec(spec: str):
+        res = set()
         for part in spec.split(","):
             if "-" in part:
                 a, b = part.split("-")
-                result.update(
-                    range(column_index_from_string(a), column_index_from_string(b) + 1)
+                res.update(
+                    range(
+                        column_index_from_string(a),
+                        column_index_from_string(b) + 1,
+                    )
                 )
             else:
-                result.add(column_index_from_string(part))
-        return sorted(result)
+                res.add(column_index_from_string(part))
+        return sorted(res)
 
     col_indices = parse_spec(columns) if columns else None
 
+    # ------- collect rows --------------------------------------------------
     preview_rows = []
     for i, row in enumerate(ws.iter_rows(values_only=True), start=1):
         if i > rows:
@@ -110,10 +127,47 @@ def preview(file, sheet, rows, columns, output, interactive, lang):
         else:
             preview_rows.append(list(row))
 
-    output_text = "\n".join(
-        [",".join("" if cell is None else str(cell) for cell in r) for r in preview_rows]
-    )
+    # ------- build output --------------------------------------------------
+    if info:
+        if not col_indices:
+            col_indices = list(
+                range(1, max(len(r) for r in preview_rows) + 1)
+            )
 
+        # convert to strings & compute width
+        str_rows = [
+            ["" if c is None else str(c) for c in r] for r in preview_rows
+        ]
+        widths = [
+            max(len(str_rows[r][idx]) if idx < len(str_rows[r]) else 0 for r in range(len(str_rows)))
+            for idx in range(len(col_indices))
+        ]
+        widths = [max(w, len(chr(64 + col))) for w, col in zip(widths, col_indices)]
+
+        header = "Cols: " + " | ".join(
+            f"{chr(64 + col):<{w}}" for col, w in zip(col_indices, widths)
+        )
+        out_lines = [header]
+
+        for ridx, row in enumerate(str_rows, start=1):
+            padded = [
+                f"{row[idx]:<{widths[cidx]}}"
+                if idx < len(row)
+                else " " * widths[cidx]
+                for cidx, idx in enumerate(range(len(col_indices)))
+            ]
+            out_lines.append(f"{ridx:>4}: " + " | ".join(padded))
+
+        output_text = "\n".join(out_lines)
+    else:
+        output_text = "\n".join(
+            [
+                ",".join("" if cell is None else str(cell) for cell in r)
+                for r in preview_rows
+            ]
+        )
+
+    # ------- output / save / pager ----------------------------------------
     if output:
         Path(output).write_text(output_text, encoding="utf-8")
         click.echo(f"Saved to {output}")
@@ -132,7 +186,13 @@ def preview(file, sheet, rows, columns, output, interactive, lang):
 @click.option("--sheets", multiple=True, help="Sheet names or indexes")
 @click.option("--rows", help="Row range start-end")
 @click.option("--columns", help="Column letters (e.g. A,B-D)")
-@click.option("--out", "out_dir", type=click.Path(), default="csv", help="Output directory")
+@click.option(
+    "--out",
+    "out_dir",
+    type=click.Path(),
+    default="csv",
+    help="Output directory",
+)
 @click.option("--overwrite", is_flag=True, help="Overwrite CSVs without timestamp")
 @click.option("--lang-help", "lang", help="Show localized help (pl, eng)")
 def export(file, sheets, rows, columns, out_dir, overwrite, lang):
@@ -150,20 +210,22 @@ def export(file, sheets, rows, columns, out_dir, overwrite, lang):
 
     wb = load_workbook(filename=file_path, data_only=True, read_only=True)
 
-    # column spec parser
-    def parse_col_spec(spec):
+    # parse column spec
+    def parse_col_spec(spec: str):
         res = set()
         for part in spec.split(","):
             if "-" in part:
                 a, b = part.split("-")
                 res.update(
-                    range(column_index_from_string(a), column_index_from_string(b) + 1)
+                    range(
+                        column_index_from_string(a),
+                        column_index_from_string(b) + 1,
+                    )
                 )
             else:
                 res.add(column_index_from_string(part))
         return sorted(res)
 
-    # rows
     row_start, row_end = None, None
     if rows:
         try:
@@ -198,7 +260,8 @@ def export(file, sheets, rows, columns, out_dir, overwrite, lang):
                     break
                 if col_indices:
                     filtered = [
-                        row[j - 1] if j - 1 < len(row) else "" for j in col_indices
+                        row[j - 1] if j - 1 < len(row) else ""
+                        for j in col_indices
                     ]
                     writer.writerow(filtered)
                 else:

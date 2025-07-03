@@ -11,6 +11,8 @@ Pokazuje pierwsze *N* wierszy i wybrane kolumny z arkusza.
 | `--columns`  | ―    | Litery kolumn, np. `A,C-E` |
 | `--output`   | ―    | Zapisz podgląd do pliku CSV |
 | `--interactive` | ✗ | Wyświetl w pagerze (`less -S`) |
+| `--info` / `-i`  | ✗ | **Dodaje nagłówek z literami kolumn i ich szerokościami, numeruje wiersze i oddziela komórki znakiem ` | ` zamiast przecinka** |
+
 
 ### 📦 Przykłady
 shellman excel preview plik.xlsx --rows 10 --columns A,B
