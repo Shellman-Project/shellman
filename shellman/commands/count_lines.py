@@ -3,17 +3,13 @@ import re
 import sys
 from datetime import datetime
 from pathlib import Path
+import importlib.resources
 
 import click
 
 
 @click.command(
-    help="""Counts lines in files or folders with filtering options.
-
-Examples:
-  shellman count_lines logs --contains error --ext log --output
-  shellman count_lines . --regex "TODO|FIXME" --ignore-case --summary --percent
-"""
+    help="Counts lines in files or folders with powerful filtering options."
 )
 @click.argument("inputs", nargs=-1, type=click.Path(exists=True))
 @click.option("--contains", help="Count lines containing this text")
@@ -25,6 +21,7 @@ Examples:
 @click.option("--output", is_flag=True, help="Save results to logs/ folder")
 @click.option("--interactive", is_flag=True, help="View results interactively")
 @click.option("--show-size", is_flag=True, help="Show file size")
+@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing the command")
 def cli(
     inputs,
     contains,
@@ -36,7 +33,12 @@ def cli(
     output,
     interactive,
     show_size,
+    lang,
 ):
+    if lang:
+        print_help_md(lang)
+        return
+
     if contains and regex:
         click.echo("Use either --contains or --regex, not both.", err=True)
         sys.exit(1)
@@ -124,3 +126,13 @@ def cli(
         pager = os.environ.get("PAGER", "less")
         click.echo("\n(Showing result interactively...)\n")
         click.echo_via_pager(final_output)
+
+
+def print_help_md(lang="eng"):
+    lang_file = f"help_{lang.lower()}.md"
+    try:
+        help_path = importlib.resources.files("shellman").joinpath(f"help_texts/count_lines/{lang_file}")
+        content = help_path.read_text(encoding="utf-8")
+        click.echo(content)
+    except Exception:
+        click.echo(f"⚠️ Help not available for language: {lang}", err=True)
