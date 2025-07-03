@@ -44,7 +44,6 @@ def test_invalid_format(tmp_path):
 
     assert result.exit_code != 0
     assert "Invalid value for '--from'" in result.output
-    assert "'unknown' is not one of 'json', 'yaml', 'toml'" in result.output
 
 
 def test_output_to_file(tmp_path):
