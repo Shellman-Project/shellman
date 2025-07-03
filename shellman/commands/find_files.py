@@ -16,7 +16,9 @@ def print_help_md(lang="eng"):
         click.echo(f"⚠️ Help not available for language: {lang}", err=True)
 
 
-@click.command()
+@click.command(
+    help="Find files by name, extension or content with filtering options."
+)
 @click.argument("search_path", required=False, type=click.Path(exists=True, file_okay=False))
 @click.option("--name", "name_filter", help="Match filenames containing this fragment")
 @click.option("--content", "content_filter", help="Search for files containing this text")

@@ -16,7 +16,9 @@ def print_help_md(lang="eng"):
         click.echo(f"⚠️ Help not available for language: {lang}", err=True)
 
 
-@click.command()
+@click.command(
+    help="Delete files by name, extension, or age – with preview and confirmation."
+)
 @click.option("--path", "scan_path", type=click.Path(exists=True, file_okay=False), default=".", help="Directory to scan")
 @click.option("--ext", "ext_filter", help="Delete files with this extension")
 @click.option("--name", "name_filter", help="Delete files whose name contains this pattern")
