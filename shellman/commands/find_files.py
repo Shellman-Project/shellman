@@ -1,30 +1,39 @@
 import os
 from datetime import datetime
 from pathlib import Path
-
+import importlib.resources
 import click
 
 
-@click.command(
-    help="""Finds files by partial name, extension, or matching content.
+def print_help_md(lang="eng"):
+    """Load and print help from markdown file."""
+    lang_file = f"help_{lang.lower()}.md"
+    try:
+        help_path = importlib.resources.files("shellman").joinpath(f"help_texts/find_files/{lang_file}")
+        content = help_path.read_text(encoding="utf-8")
+        click.echo(content)
+    except Exception:
+        click.echo(f"⚠️ Help not available for language: {lang}", err=True)
 
-Examples:
-  shellman find_files . --name log
-  shellman find_files ./docs --content "error 404" --ext md
-  shellman find_files ./src --name util --output --show-size
-"""
-)
-@click.argument("search_path", type=click.Path(exists=True, file_okay=False))
+
+@click.command()
+@click.argument("search_path", required=False, type=click.Path(exists=True, file_okay=False))
 @click.option("--name", "name_filter", help="Match filenames containing this fragment")
-@click.option(
-    "--content", "content_filter", help="Search for files containing this text"
-)
+@click.option("--content", "content_filter", help="Search for files containing this text")
 @click.option("--ext", "ext_filter", help="Only include files with this extension")
-@click.option(
-    "--output", is_flag=True, help="Save results to logs/find_files_<timestamp>.log"
-)
+@click.option("--output", is_flag=True, help="Save results to logs/find_files_<timestamp>.log")
 @click.option("--show-size", is_flag=True, help="Show file size next to each result")
-def cli(search_path, name_filter, content_filter, ext_filter, output, show_size):
+@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing the command")
+def cli(search_path, name_filter, content_filter, ext_filter, output, show_size, lang):
+    if lang:
+        print_help_md(lang)
+        return
+
+    if not search_path:
+        click.echo("❗ Missing required SEARCH_PATH\n")
+        print_help_md("eng")
+        return
+
     path = Path(search_path)
     if not path.is_dir():
         click.echo(f"Path is not a directory: {search_path}", err=True)
@@ -41,9 +50,7 @@ def cli(search_path, name_filter, content_filter, ext_filter, output, show_size)
             continue
         if content_filter:
             try:
-                if content_filter not in file.read_text(
-                    encoding="utf-8", errors="ignore"
-                ):
+                if content_filter not in file.read_text(encoding="utf-8", errors="ignore"):
                     continue
             except Exception:
                 continue

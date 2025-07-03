@@ -1,6 +1,6 @@
 [project]
 name = "shellman"
-version = "0.8.2"
+version = "0.8.3"
 description = "Your friendly shell assistant"
 authors = [{name = "Jakub Marciniak", email = "jakub.marciniak.app@gmail.com"}]
 readme = "README.md"
@@ -33,3 +33,6 @@ ignore = []                    # możesz ignorować kody np. ["E501"]
 quote-style = "double"
 indent-style = "space"
 docstring-code-format = true
+
+[tool.setuptools.package-data]
+"shellman" = ["help_texts/**"]
