@@ -54,3 +54,16 @@ cli.add_command(json_extract.cli, name="json_extract")
 cli.add_command(date_utils.cli, name="date_utils")
 cli.add_command(merge_files.cli, name="merge_files")
 cli.add_command(zip_batch.cli, name="zip_batch")
+@cli.command(name="help")
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+def help_cmd(args):
+    """Show this message and exit."""
+    from click.testing import CliRunner
+    runner = CliRunner()
+    result = runner.invoke(cli, ["--help"] if not args else list(args) + ["--help"])
+    click.echo(result.output)
+@cli.command(name="version")
+def version_cmd():
+    """Show version and exit."""
+    click.echo(VERSION)
+
