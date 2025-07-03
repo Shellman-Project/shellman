@@ -1,48 +1,82 @@
-import click
-import json
 from pathlib import Path
+import json
+import importlib.resources
 
-@click.command(help="""Extract and filter JSON data with optional field selection.
+import click
 
-Examples:
-  shellman json_extract data.json --path items --fields id,name
-  shellman json_extract data.json --filter status=ERROR --fields id,msg --output errors.json
-""")
-@click.argument("file", type=click.Path(exists=True, dir_okay=False))
-@click.option("--path", "path_expr", help="Key path to list, e.g. 'items'")
-@click.option("--filter", "filter_expr", help="Filter: key=value to match")
-@click.option("--fields", help="Comma-separated list of fields to select")
+
+@click.command(
+    help="Extract and filter JSON data with optional field selection."
+)
+@click.argument("file", required=False)
+@click.option("--path", "path_expr", help="Dot-separated key path to list/obj, e.g. 'items' or 'root.nested.items'")
+@click.option("--filter", "filter_expr", help="Filter: key=value to match (string compare)")
+@click.option("--fields", help="Comma-separated list of fields to include in output")
 @click.option("--output", "output_file", type=click.Path(), help="Save result to file")
-@click.option("--interactive", is_flag=True, default=False, help="Pipe output through pager")
-def cli(file, path_expr, filter_expr, fields, output_file, interactive):
-    file_path = Path(file)
-    data = json.loads(file_path.read_text(encoding="utf-8"))
+@click.option("--interactive", is_flag=True, help="Pipe result through pager")
+@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing")
+def cli(file, path_expr, filter_expr, fields, output_file, interactive, lang):
+    # ---------- lokalizowana pomoc ---------- #
+    if lang:
+        _print_help_md(lang)
+        return
 
+    # ---------- walidacja ---------- #
+    if not file:
+        raise click.UsageError("Missing required argument 'file'")
+
+    # ---------- wczytaj JSON ---------- #
+    file_path = Path(file)
+    try:
+        data = json.loads(file_path.read_text(encoding="utf-8"))
+    except Exception as e:
+        raise click.ClickException(f"Failed to read/parse JSON: {e}")
+
+    # ---------- nawigacja po ścieżce ---------- #
     if path_expr:
         for key in path_expr.split("."):
             if key:
-                data = data[key]
+                try:
+                    data = data[key]
+                except Exception:
+                    raise click.ClickException(f"Key '{key}' not found in path '{path_expr}'")
 
+    # ---------- zawsze operujemy na liście ---------- #
     if not isinstance(data, list):
         data = [data]
 
+    # ---------- filtrowanie ---------- #
     if filter_expr and "=" in filter_expr:
         key, value = filter_expr.split("=", 1)
         data = [entry for entry in data if str(entry.get(key)) == value]
 
+    # ---------- wybór pól ---------- #
     if fields:
         field_list = [f.strip() for f in fields.split(",")]
         data = [{k: v for k, v in entry.items() if k in field_list} for entry in data]
 
-    output = "\n".join(json.dumps(d, ensure_ascii=False) for d in data)
+    # ---------- wynik ---------- #
+    output_text = "\n".join(json.dumps(d, ensure_ascii=False) for d in data)
 
     if output_file:
-        Path(output_file).write_text(output, encoding="utf-8")
+        Path(output_file).write_text(output_text, encoding="utf-8")
         click.echo(f"Saved to {output_file}")
         if interactive:
-            click.echo_via_pager(output)
+            click.echo_via_pager(output_text)
     else:
         if interactive:
-            click.echo_via_pager(output)
+            click.echo_via_pager(output_text)
         else:
-            click.echo(output)
+            click.echo(output_text)
+
+
+# ---------- Markdown help loader ---------- #
+def _print_help_md(lang: str = "eng"):
+    lang_file = f"help_{lang.lower()}.md"
+    try:
+        help_path = importlib.resources.files("shellman").joinpath(
+            f"help_texts/json_extract/{lang_file}"
+        )
+        click.echo(help_path.read_text(encoding="utf-8"))
+    except Exception:
+        click.echo(f"⚠️ Help not available for language: {lang}", err=True)
