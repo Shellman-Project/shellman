@@ -35,9 +35,9 @@ def cli():
     """Shellman – your friendly shell assistant 💬
     
     For command help in your lang:
-    shellman count_lines --lang-help pl
-    Available languages:
-    eng, pl
+    shellman count_lines --lang-help pl \n
+    [Available languages:
+    eng, pl]
 
     """
     pass
