@@ -1,35 +1,34 @@
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
+import importlib.resources
 
 import click
 
 
-@click.command(
-    help="""Deletes unwanted files (by name, extension or age).
+def print_help_md(lang="eng"):
+    lang_file = f"help_{lang.lower()}.md"
+    try:
+        help_path = importlib.resources.files("shellman").joinpath(f"help_texts/clean_files/{lang_file}")
+        content = help_path.read_text(encoding="utf-8")
+        click.echo(content)
+    except Exception:
+        click.echo(f"⚠️ Help not available for language: {lang}", err=True)
 
-Examples:
-  shellman clean_files --ext tmp --older-than 7 --dry-run
-  shellman clean_files --path ./build --name '~' --confirm
-"""
-)
-@click.option(
-    "--path",
-    "scan_path",
-    type=click.Path(exists=True, file_okay=False),
-    default=".",
-    help="Directory to scan",
-)
+
+@click.command()
+@click.option("--path", "scan_path", type=click.Path(exists=True, file_okay=False), default=".", help="Directory to scan")
 @click.option("--ext", "ext_filter", help="Delete files with this extension")
-@click.option(
-    "--name", "name_filter", help="Delete files whose name contains this pattern"
-)
-@click.option(
-    "--older-than", "age_days", type=int, help="Delete only files older than N days"
-)
+@click.option("--name", "name_filter", help="Delete files whose name contains this pattern")
+@click.option("--older-than", "age_days", type=int, help="Delete only files older than N days")
 @click.option("--dry-run", is_flag=True, help="Preview: list files but do NOT delete")
 @click.option("--confirm", is_flag=True, help="Ask Y/n before deleting each file")
-def cli(scan_path, ext_filter, name_filter, age_days, dry_run, confirm):
+@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing the command")
+def cli(scan_path, ext_filter, name_filter, age_days, dry_run, confirm, lang):
+    if lang:
+        print_help_md(lang)
+        return
+
     scan_path = Path(scan_path)
 
     if not ext_filter and not name_filter:
