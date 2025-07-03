@@ -1,44 +1,31 @@
 import os
 from pathlib import Path
-
+import importlib.resources
 import click
 
 
-@click.command(
-    help="""Convert or check line endings in files (LF ↔ CRLF).
+def print_help_md(lang="eng"):
+    lang_file = f"help_{lang.lower()}.md"
+    try:
+        help_path = importlib.resources.files("shellman").joinpath(f"help_texts/change_line_end/{lang_file}")
+        content = help_path.read_text(encoding="utf-8")
+        click.echo(content)
+    except Exception:
+        click.echo(f"⚠️ Help not available for language: {lang}", err=True)
 
-Examples:
-  shellman line_endings --file script.sh --to lf
-  shellman line_endings --dir src --ext .txt --to crlf
-  shellman line_endings --dir src --check
-"""
-)
-@click.option(
-    "--file",
-    "file_path",
-    type=click.Path(exists=True, dir_okay=False),
-    help="Path to a single file",
-)
-@click.option(
-    "--dir",
-    "dir_path",
-    type=click.Path(exists=True, file_okay=False),
-    help="Path to directory (will recurse)",
-)
+
+@click.command()
+@click.option("--file", "file_path", type=click.Path(exists=True, dir_okay=False), help="Path to a single file")
+@click.option("--dir", "dir_path", type=click.Path(exists=True, file_okay=False), help="Path to directory (will recurse)")
 @click.option("--ext", help="Only process files with this extension (requires --dir)")
-@click.option(
-    "--to",
-    "target",
-    type=click.Choice(["lf", "crlf"]),
-    help="Convert to specified line endings",
-)
-@click.option(
-    "--check",
-    "check_mode",
-    is_flag=True,
-    help="Only check and report line ending type per file",
-)
-def cli(file_path, dir_path, ext, target, check_mode):
+@click.option("--to", "target", type=click.Choice(["lf", "crlf"]), help="Convert to specified line endings")
+@click.option("--check", "check_mode", is_flag=True, help="Only check and report line ending type per file")
+@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing the command")
+def cli(file_path, dir_path, ext, target, check_mode, lang):
+    if lang:
+        print_help_md(lang)
+        return
+
     if not check_mode and not target:
         raise click.UsageError("Either --to or --check is required")
     if not file_path and not dir_path:
