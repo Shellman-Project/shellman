@@ -15,7 +15,6 @@ from .commands import (
     csv_extract,
     json_extract,
     date_utils,
-    merge_files,
     zip_batch,
 )
 
@@ -55,7 +54,6 @@ cli.add_command(excel.cli, name="excel")
 cli.add_command(csv_extract.cli, name="csv_extract")
 cli.add_command(json_extract.cli, name="json_extract")
 cli.add_command(date_utils.cli, name="date_utils")
-cli.add_command(merge_files.cli, name="merge_files")
 cli.add_command(zip_batch.cli, name="zip_batch")
 @cli.command(name="help")
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
