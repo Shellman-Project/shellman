@@ -11,8 +11,6 @@ automatically on first run).
 | `--only` dl/ul/ping | Show a single metric |
 | `--lang-help`   | Show help in Polish / English |
 
-```bash
 shellman speed_test                 # all metrics
 shellman speed_test --only ping     # just ping
 shellman speed_test --json          # machine-readable
-```
