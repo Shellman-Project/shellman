@@ -21,7 +21,13 @@ from .commands import (
     zip_batch,
 )
 
-VERSION = open("VERSION").read().strip()
+import importlib.resources
+
+try:
+    VERSION = importlib.resources.files("shellman").joinpath("VERSION").read_text().strip()
+except Exception:
+    VERSION = "unknown"
+
 
 @click.group()
 @click.version_option(version=VERSION)
