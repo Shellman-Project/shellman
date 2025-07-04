@@ -55,8 +55,24 @@ shellman <command> --lang-help pl        # Polish help
 Example:
 
 ```bash
-shellman excel info report.xlsx
-shellman extract_lines sys.log --contains ERROR --before 2 --after 3
+shellman lines README.md --count --show-size --contains shellman/com --extract --before 2 --after 2 --percent
+
+==> README.md <==
+88:
+89:Pull-requests and feature ideas are welcome!
+90:Each command lives in shellman/commands/ – feel free to add your own tool.
+91:
+92:########################################################################################
+--------------------
+182:
+183:Masz pomysł lub poprawkę? Zgłoś pull-request lub otwórz issue.
+184:Każde narzędzie znajduje się w shellman/commands/ – śmiało dodaj własne!
+185:
+
+==> README.md <==
+Matching lines: 2
+Match percentage: 1.08%
+File size: 5.31 KB
 ```
 ## 📦 Available commands (short list)
 
@@ -145,8 +161,24 @@ shellman <komenda> --lang-help pl      # pomoc po polsku
 Przykład:
 
 ```bash
-shellman excel preview raport.xlsx --rows 10 --columns A-F --info
-shellman replace_text src --find TODO --replace DONE --ext py --preview
+shellman lines README.md --count --show-size --contains shellman/com --extract --before 2 --after 2 --percent
+
+==> README.md <==
+88:
+89:Pull-requests and feature ideas are welcome!
+90:Each command lives in shellman/commands/ – feel free to add your own tool.
+91:
+92:########################################################################################
+--------------------
+182:
+183:Masz pomysł lub poprawkę? Zgłoś pull-request lub otwórz issue.
+184:Każde narzędzie znajduje się w shellman/commands/ – śmiało dodaj własne!
+185:
+
+==> README.md <==
+Matching lines: 2
+Match percentage: 1.08%
+File size: 5.31 KB
 ```
 ## 📦 Dostępne komendy (wybrane)
 
