@@ -1,6 +1,6 @@
 [project]
 name = "shellman"
-version = "1.0.5"
+version = "1.0.6"
 description = "Your friendly shell assistant"
 authors = [{name = "Jakub Marciniak", email = "jakub.marciniak.app@gmail.com"}]
 readme = "README.md"
@@ -15,6 +15,7 @@ dependencies = [
     "chardet",
     "pyserial",
     "psutil",
+    "wmi",
 ]
 
 [project.scripts]
