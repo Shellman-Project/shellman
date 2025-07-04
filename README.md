@@ -79,6 +79,9 @@ merge_files	merge multiple text files into one
 replace_text	batch find-&-replace with diff preview
 sys_summary	system / shell / resource report
 zip_batch	bulk ZIP creation (per-folder or flat)
+open_ports  Show currently open TCP/UDP ports (process, pid, address, state).
+speed_test	Run a quick internet speed test (download, upload, ping).
+dir_tree  Prints a visual tree of directories (like 'tree').
 ```
 Plus a few helpers: checksum_files, date_utils, etc. Run --help on any sub-command for full docs.
 
@@ -167,6 +170,9 @@ merge_files	łączenie plików tekstowych
 replace_text	zbiorcza podmiana tekstu z podglądem diff
 sys_summary	raport o systemie, powłoce, zasobach
 zip_batch	hurtowe tworzenie plików ZIP
+open_ports  Pokaż aktualnie otwarte porty TCP/UDP (proces, pid, adres, stan).
+speed_test	Wykonaj szybki test szybkości łącza internetowego (pobieranie, wysyłanie, pingowanie).
+dir_tree  Drukuje wizualne drzewo katalogów (jak „drzewo”).
 ```
 Do odkrywania szczegółów użyj --help, np.:
 
