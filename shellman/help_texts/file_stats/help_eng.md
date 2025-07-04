@@ -1,23 +1,25 @@
-📊 **file_stats – Quick File Statistics**
+📊 **file_stats – File Statistics and Metadata**
 
-List each file’s absolute path, number of lines, file-size and extension.
+Scans one or more files/folders and shows:
+- file path
+- size
+- number of lines
+- extension
 
----
+Optional metadata:
+- creation and modification time
+- text/binary classification
+- encoding
 
-### 🔧 Options
+#### Options
+| option        | description |
+|---------------|-------------|
+| `--ext`       | filter by extension |
+| `--output`    | save result to log |
+| `--meta`      | show file metadata |
+| `--lang-help` | show help in pl / eng |
 
-| option | description |
-|--------|-------------|
-| `--ext EXT` | Only include files with extension `EXT` |
-| `--output`  | Save results to `logs/file_stats_<timestamp>.log` |
-| `--lang-help pl/eng` | Show this help in Polish / English |
-
----
-
-### 📦 Examples
-
-Inspect a single file:
-shellman file_stats myfile.txt
-
-Show stats of all .py files inside src/ and save to log:
-shellman file_stats ./src --ext py --output
+#### Examples
+shellman file_stats . --ext py
+shellman file_stats README.md --meta
+shellman file_stats src/ --output

@@ -2,6 +2,7 @@ from pathlib import Path
 from datetime import datetime
 import os
 import importlib.resources
+import chardet
 
 import click
 
@@ -9,17 +10,16 @@ import click
 @click.command(
     help="Show full path, file size, line-count and extension for each file."
 )
-@click.argument("inputs", nargs=-1)   # brak required, walidujemy ręcznie
+@click.argument("inputs", nargs=-1)
 @click.option("--ext", help="Only include files with this extension")
+@click.option("--meta", is_flag=True, help="Include file metadata (created, modified, type, encoding)")
 @click.option("--output", is_flag=True, help="Save results to logs/file_stats_<timestamp>.log")
 @click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing")
-def cli(inputs, ext, output, lang):
-    # ---------- lokalizowana pomoc ---------- #
+def cli(inputs, ext, meta, output, lang):
     if lang:
         _print_help_md(lang)
         return
 
-    # ---------- walidacja ---------- #
     if not inputs:
         raise click.UsageError("No files or directories provided.")
 
@@ -56,9 +56,18 @@ def cli(inputs, ext, output, lang):
         file_ext = file.suffix or ""
 
         results.append(f"\n==> {file} <==")
-        results.append(f"Lines: {line_count}")
-        results.append(f"Size: {size_display}")
-        results.append(f"Extension: {file_ext}")
+        results.append(f"Lines     : {line_count}")
+        results.append(f"Size      : {size_display}")
+        results.append(f"Extension : {file_ext}")
+
+        if meta:
+            created = datetime.fromtimestamp(file.stat().st_ctime).strftime("%Y-%m-%d %H:%M:%S")
+            modified = datetime.fromtimestamp(file.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+            ftype, encoding = detect_file_type_and_encoding(file)
+            results.append(f"Created   : {created}")
+            results.append(f"Modified  : {modified}")
+            results.append(f"Type      : {ftype}")
+            results.append(f"Encoding  : {encoding}")
 
     final_output = "\n".join(results)
     click.echo(final_output)
@@ -71,7 +80,23 @@ def cli(inputs, ext, output, lang):
         click.echo(f"Results saved to {log_file}")
 
 
-# ---------- Markdown help loader ---------- #
+def detect_file_type_and_encoding(path: Path) -> tuple[str, str]:
+    try:
+        raw = path.read_bytes()
+        detected = chardet.detect(raw)
+        encoding = detected["encoding"] or "unknown"
+        confidence = detected["confidence"] or 0
+
+        if confidence > 0.8 and encoding.lower() in ("ascii", "utf-8"):
+            return ("Text", encoding)
+        elif b"\x00" in raw:
+            return ("Binary", "binary")
+        else:
+            return ("Text", encoding or "unknown")
+    except Exception:
+        return ("unknown", "unknown")
+
+
 def _print_help_md(lang: str = "eng"):
     lang_file = f"help_{lang.lower()}.md"
     try:
