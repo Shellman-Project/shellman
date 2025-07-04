@@ -65,10 +65,15 @@ def cli(search_path, name_filter, content_filter, ext_filter, output, show_size,
     results = []
     for file in found_files:
         if show_size:
-            size_mb = os.path.getsize(file) / (1024 * 1024)
-            results.append(f"{file}  [{size_mb:.2f} MB]")
+            size_bytes = os.path.getsize(file)
+            if size_bytes < 1024 * 1024:                          # < 1 MiB
+                size_display = f"{size_bytes / 1024:.2f} KB"
+            else:
+                size_display = f"{size_bytes / (1024 * 1024):.2f} MB"
+            results.append(f"{file}  [{size_display}]")
         else:
             results.append(str(file))
+
 
     final_output = "\n".join(results)
     click.echo(final_output)
