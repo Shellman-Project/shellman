@@ -1,23 +1,25 @@
-📊 **file_stats – Szybkie statystyki plików**
+📊 **file_stats – Statystyki i metadane plików**
 
-Wyświetla pełną ścieżkę, liczbę linii, rozmiar i rozszerzenie każdego pliku.
+Skanuje pliki i pokazuje:
+- ścieżkę
+- rozmiar
+- liczbę linii
+- rozszerzenie
 
----
+Dodatkowo można uzyskać:
+- datę utworzenia i modyfikacji
+- czy plik jest tekstowy/binarny
+- wykryte kodowanie
 
-### 🔧 Opcje
+#### Opcje
+| opcja         | opis |
+|---------------|------|
+| `--ext`       | filtruj po rozszerzeniu |
+| `--output`    | zapisz wynik do loga |
+| `--meta`      | pokaż metadane pliku |
+| `--lang-help` | pokaż pomoc po polsku lub angielsku |
 
-| opcja | opis |
-|-------|------|
-| `--ext EXT` | Uwzględnij tylko pliki z rozszerzeniem `EXT` |
-| `--output`  | Zapisz wynik do `logs/file_stats_<timestamp>.log` |
-| `--lang-help pl/eng` | Pokaż tę pomoc po PL / ENG |
-
----
-
-### 📦 Przykłady
-
-Statystyki pojedynczego pliku:
-shellman file_stats plik.txt
-
-Statystyki wszystkich plików .py w src/ z logiem:
-shellman file_stats ./src --ext py --output
+#### Przykłady
+shellman file_stats . --ext py
+shellman file_stats README.md --meta
+shellman file_stats src/ --output
