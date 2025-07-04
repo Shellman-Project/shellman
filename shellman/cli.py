@@ -3,9 +3,8 @@ from .commands import (
     change_line_end,
     checksum_files,
     clean_files,
-    count_lines,
     encrypt_files,
-    extract_lines,
+    lines,
     file_convert,
     file_stats,
     find_files,
@@ -42,7 +41,6 @@ def cli():
     """
     pass
 
-cli.add_command(count_lines.cli, name="count_lines")
 cli.add_command(file_stats.cli, name="file_stats")
 cli.add_command(find_files.cli, name="find_files")
 cli.add_command(checksum_files.cli, name="checksum_files")
@@ -52,7 +50,6 @@ cli.add_command(replace_text.cli, name="replace_text")
 cli.add_command(encrypt_files.cli, name="encrypt_files")
 cli.add_command(sys_summary.cli, name="sys_summary")
 cli.add_command(change_line_end.cli, name="change_line_end")
-cli.add_command(extract_lines.cli, name="extract_lines")
 cli.add_command(excel.cli, name="excel")
 cli.add_command(csv_extract.cli, name="csv_extract")
 cli.add_command(json_extract.cli, name="json_extract")
@@ -61,6 +58,7 @@ cli.add_command(zip_batch.cli, name="zip_batch")
 cli.add_command(speed_test.cli, name="speed_test")
 cli.add_command(open_ports.cli, name="open_ports")
 cli.add_command(dir_tree.cli, name="dir_tree")
+cli.add_command(lines.cli, name="lines")
 @cli.command(name="help")
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 def help_cmd(args):
