@@ -1,29 +1,31 @@
-🔌 **open_ports – List Active TCP/UDP Ports**
+🔌 **open_ports – List Active TCP/UDP and Serial Ports**
 
-Show which local ports are currently open and which process owns them.  
-Works cross-platform via the pure-python `psutil` library (auto-installed on first run).
+Show which local TCP/UDP ports are currently open (with process/PID/state),  
+**plus (optionally) all physical serial/parallel ports** (COM, LPT, tty, cu).
 
 ---
 
 ### 🔧 Options
 
-| option | description |
-|--------|-------------|
+| option         | description |
+|----------------|-------------|
 | `--proto tcp/udp` | Filter by protocol |
 | `--port N`        | Filter by local port number |
-| `--json`          | Output raw JSON |
+| `--json`          | Output raw JSON (TCP/UDP only) |
+| `--serial`        | List serial/parallel ports (COMx, LPTx, ttyUSB, ttyACM, cu.* etc.) |
 | `--lang-help`     | Show help (`pl` / `eng`) |
 
 ---
 
 ### 📦 Examples
 
-All sockets:
+All open network ports:
 shellman open_ports
 
-Only UDP sockets on port 53:
+All serial and parallel ports:
+shellman open_ports --serial
+
+Only UDP on port 53:
 shellman open_ports --proto udp --port 53
 
-Machine-readable JSON:
-shellman open_ports --json
-
+Requires pyserial for best serial port detection (on Windows).
