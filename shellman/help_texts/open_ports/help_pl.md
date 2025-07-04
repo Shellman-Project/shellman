@@ -1,34 +1,31 @@
-🔌 **open_ports – Lista aktywnych portów TCP/UDP**
+🔌 **open_ports – Lista aktywnych portów TCP/UDP i portów szeregowych**
 
-Wyświetla aktualnie otwarte porty wraz z nazwą procesu i PID.  
-Działa na każdym systemie dzięki bibliotece `psutil` (instaluje się automatycznie przy pierwszym uruchomieniu).
+Wyświetla otwarte porty TCP/UDP (proces, PID, stan),  
+**a dodatkowo (na żądanie) wszystkie fizyczne porty szeregowe i równoległe** (COM, LPT, tty, cu).
 
 ---
 
 ### 🔧 Opcje
 
-| opcja | opis |
-|-------|------|
+| opcja           | opis |
+|-----------------|------|
 | `--proto tcp/udp` | Filtruj po protokole |
-| `--port N`        | Filtruj po numerze portu |
-| `--json`          | Zwróć surowy JSON |
-| `--lang-help`     | Pokaż pomoc (`pl` / `eng`) |
+| `--port N`        | Filtruj po porcie lokalnym |
+| `--json`          | Surowy JSON (tylko TCP/UDP) |
+| `--serial`        | Wypisz porty szeregowe/równoległe (COMx, LPTx, ttyUSB, ttyACM, cu.* itp.) |
+| `--lang-help`     | Pokaż pomoc (pl / eng) |
 
 ---
 
 ### 📦 Przykłady
 
-Wszystkie otwarte porty:
+Wszystkie otwarte porty sieciowe:
 shellman open_ports
+
+Wszystkie porty szeregowe i równoległe:
+shellman open_ports --serial
 
 Tylko UDP na porcie 53:
 shellman open_ports --proto udp --port 53
 
-JSON do dalszego przetwarzania:
-shellman open_ports --json
-
----
-
-Po dodaniu plików i reinstalacji w trybie editable:
-shellman open_ports
-shellman open_ports --lang-help pl
+Wymaga pyserial do najlepszej detekcji portów (Windows).
