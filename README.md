@@ -67,11 +67,10 @@ find_files	locate files by name, content or extension
 change_line_end	LF ↔ CRLF conversion / check
 checksum_files	create or verify checksums (sha256, md5, sha1)
 clean_files	delete junk files by name, ext or age
-count_lines	count (or grep) lines, show % matches
+lines	Extract, count or summarize lines in files or folders with powerful filters and context options.
 csv_extract	extract columns/rows from CSV
 date_utils	add/subtract dates, diff, strftime
 encrypt_files	AES-256 encrypt / decrypt with password
-extract_lines	grep lines with ±context and line numbers
 file_convert	JSON ←→ YAML ←→ TOML
 file_stats	full path • size • line-count • extension
 json_extract	JSON path, filter and field selection
@@ -158,11 +157,10 @@ find_files	wyszukiwanie plików po nazwie, treści lub rozszerzeniu
 change_line_end	konwersja lub sprawdzenie końców linii LF/CRLF
 checksum_files	generowanie / weryfikacja sum kontrolnych
 clean_files	usuwanie zbędnych plików wg wzorca lub wieku
-count_lines	liczenie linii (z opcją filtrów i % dopasowań)
+lines	Wyodrębniaj, licz lub podsumowuj wiersze w plikach lub folderach przy użyciu zaawansowanych filtrów i opcji kontekstowych.
 csv_extract	wyciąganie kolumn / wierszy z CSV
 date_utils	operacje na datach: +/- czas, różnice, formatowanie
 encrypt_files	szyfrowanie / deszyfrowanie AES-256
-extract_lines	wypisywanie linii z kontekstem ±N
 file_convert	konwersja JSON ↔ YAML ↔ TOML
 file_stats	ścieżka • rozmiar • liczba linii • rozszerzenie
 json_extract	filtrowanie / wybór pól w JSON
