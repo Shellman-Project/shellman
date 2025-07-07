@@ -32,6 +32,20 @@ def _build_tree(root: Path, include_files: bool, max_depth: int, show_hidden: bo
     lines = []
 
     def walk(dir_path, prefix="", level=0):
+        try:
+            entries = [
+                e for e in dir_path.iterdir()
+                if show_hidden or not e.name.startswith(".")
+            ]
+        except PermissionError:
+            print(f"{prefix}{dir_path.name} [access denied]")
+            return
+        print(f"{prefix}{dir_path.name}/")
+        for entry in entries:
+            if entry.is_dir():
+                walk(entry, prefix + "    ", level + 1)
+            else:
+                print(f"{prefix}    {entry.name}")
         if max_depth is not None and level > max_depth:
             return
         entries = sorted(
