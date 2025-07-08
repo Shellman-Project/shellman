@@ -27,17 +27,35 @@ try:
 except Exception:
     VERSION = "unknown"
 
+AUTOR_INFO = """
+──────────────────────────────────────────────
+Author:
+  Jakub Marciniak
+Contact:
+  jakub.marciniak.app@gmail.com | marciniakjakub93@gmail.com
+LinkedIn:
+  https://www.linkedin.com/in/jakub-marciniak-33586b150/
+GitHub:
+  https://github.com/JakubMarciniak93
+──────────────────────────────────────────────
+"""
 
-@click.group()
+class ShellmanGroup(click.Group):
+    def format_help(self, ctx, formatter):
+        super().format_help(ctx, formatter)
+        click.echo(AUTOR_INFO)
+
+@click.group(cls=ShellmanGroup)
 @click.version_option(version=VERSION)
 def cli():
-    """Shellman – your friendly shell assistant 💬
-    
-    For command help in your lang:
-    shellman count_lines --lang-help pl \n
-    [Available languages:
-    eng, pl]
+    """
+    Shellman – your friendly shell assistant 💬
 
+    For command help in your lang: \n
+    shellman count_lines --lang-help pl
+
+    [Available languages: eng, pl] \n
+    ──────────────────────────────────────────────
     """
     pass
 
@@ -59,6 +77,7 @@ cli.add_command(speed_test.cli, name="speed_test")
 cli.add_command(open_ports.cli, name="open_ports")
 cli.add_command(dir_tree.cli, name="dir_tree")
 cli.add_command(lines.cli, name="lines")
+
 @cli.command(name="help")
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 def help_cmd(args):
@@ -67,8 +86,8 @@ def help_cmd(args):
     runner = CliRunner()
     result = runner.invoke(cli, ["--help"] if not args else list(args) + ["--help"])
     click.echo(result.output)
+
 @cli.command(name="version")
 def version_cmd():
     """Show version and exit."""
     click.echo(VERSION)
-
