@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import fnmatch
 import click
 import importlib.resources
 
@@ -8,19 +9,28 @@ import importlib.resources
     help="Prints a visual tree of directories (like 'tree')."
 )
 @click.argument("path", default=".", type=click.Path(exists=True, file_okay=False))
-@click.option("--files", is_flag=True, help="Include files, not just folders")
-@click.option("--depth", type=int, help="Limit recursion depth")
-@click.option("--output", type=click.Path(), help="Save result to file")
-@click.option("--hidden", is_flag=True, help="Include hidden files/folders")
-@click.option("--ascii", is_flag=True, help="Use ASCII instead of Unicode box lines")
+@click.option("--files", "-f", is_flag=True, help="Include files, not just folders")
+@click.option("--depth", "-d", type=int, help="Limit recursion depth")
+@click.option("--output", "-o", type=click.Path(), help="Save result to file")
+@click.option("--hidden", "-h", is_flag=True, help="Include hidden files/folders")
+@click.option("--ascii", "-a", is_flag=True, help="Use ASCII instead of Unicode box lines")
+@click.option(
+    "--exclude",
+    "-x",
+    multiple=True,
+    help="Exclude patterns (folder names, file names, or extensions, e.g. __pycache__, *.txt, *.pyc)"
+)
 @click.option("--lang-help", "lang", help="Show localized help (pl, eng)")
-def cli(path, files, depth, output, hidden, ascii, lang):
+def cli(path, files, depth, output, hidden, ascii, exclude, lang):
     if lang:
         _print_help_md(lang)
         return
 
+    default_excludes = ["__pycache__", "*.pyc"]
+    exclude_patterns = list(default_excludes) + list(exclude)
+
     root = Path(path).resolve()
-    tree = _build_tree(root, files, depth, hidden, ascii)
+    tree = _build_tree(root, files, depth, hidden, ascii, exclude_patterns)
     if output:
         Path(output).write_text(tree, encoding="utf-8")
         click.echo(f"Saved to {output}")
@@ -28,30 +38,29 @@ def cli(path, files, depth, output, hidden, ascii, lang):
         click.echo(tree)
 
 
-def _build_tree(root: Path, include_files: bool, max_depth: int, show_hidden: bool, ascii_mode: bool):
+def _build_tree(root: Path, include_files: bool, max_depth: int, show_hidden: bool, ascii_mode: bool, exclude_patterns):
     lines = []
 
+    def is_excluded(entry: Path) -> bool:
+        """Check if the entry matches any exclude pattern."""
+        for pattern in exclude_patterns:
+            if fnmatch.fnmatch(entry.name, pattern) or fnmatch.fnmatch(str(entry), pattern):
+                return True
+        return False
+
     def walk(dir_path, prefix="", level=0):
-        try:
-            entries = [
-                e for e in dir_path.iterdir()
-                if show_hidden or not e.name.startswith(".")
-            ]
-        except PermissionError:
-            print(f"{prefix}{dir_path.name} [access denied]")
-            return
-        print(f"{prefix}{dir_path.name}/")
-        for entry in entries:
-            if entry.is_dir():
-                walk(entry, prefix + "    ", level + 1)
-            else:
-                print(f"{prefix}    {entry.name}")
         if max_depth is not None and level > max_depth:
             return
-        entries = sorted(
-            [e for e in dir_path.iterdir() if show_hidden or not e.name.startswith(".")],
-            key=lambda e: (e.is_file(), e.name.lower())
-        )
+        try:
+            entries = sorted(
+                [e for e in dir_path.iterdir()
+                 if (show_hidden or not e.name.startswith(".")) and not is_excluded(e)],
+                key=lambda e: (e.is_file(), e.name.lower())
+            )
+        except PermissionError:
+            lines.append(f"{prefix}[access denied] {dir_path.name}/")
+            return
+
         for i, entry in enumerate(entries):
             is_last = i == len(entries) - 1
             connector = "└── " if is_last else "├── "
@@ -61,8 +70,6 @@ def _build_tree(root: Path, include_files: bool, max_depth: int, show_hidden: bo
             if entry.is_dir():
                 ext_prefix = "    " if is_last else ("│   " if not ascii_mode else "|   ")
                 walk(entry, prefix + ext_prefix, level + 1)
-            elif include_files:
-                continue
 
     lines.append(f"{root.name}/")
     walk(root)
