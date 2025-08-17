@@ -12,6 +12,7 @@ SUPPORTED_ALGOS = {
 
 
 def print_help_md(lang="eng"):
+    """Print localized help text for the `checksum_files` command."""
     lang_file = f"help_{lang.lower()}.md"
     try:
         help_path = importlib.resources.files("shellman").joinpath(f"help_texts/checksum_files/{lang_file}")
@@ -24,13 +25,39 @@ def print_help_md(lang="eng"):
 @click.command(
     help="Generate or verify checksums (SHA256, MD5, etc.) for files."
 )
-@click.option("--path", "scan_path", type=click.Path(exists=True, file_okay=False), default=".", help="Directory to scan")
-@click.option("--ext", "ext_filter", help="Only include files with this extension")
-@click.option("--algo", type=click.Choice(["sha256", "md5", "sha1"]), default="sha256", help="Hash algorithm")
-@click.option("--out", "out_file", type=click.Path(), help="Output list file name")
-@click.option("--verify", is_flag=True, help="Verify instead of generate (reads --out list)")
-@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing the command")
+@click.option("--path","-p", "scan_path", type=click.Path(exists=True, file_okay=False), default=".", help="Directory to scan")
+@click.option("--ext","-e", "ext_filter", help="Only include files with this extension")
+@click.option("--algo","-a", type=click.Choice(["sha256", "md5", "sha1"]), default="sha256", help="Hash algorithm")
+@click.option("--out","-o", "out_file", type=click.Path(), help="Output list file name")
+@click.option("--verify","-v", is_flag=True, help="Verify instead of generate (reads --out list)")
+@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
 def cli(scan_path, ext_filter, algo, out_file, verify, lang):
+    """
+    Command-line interface for generating or verifying file checksums.
+
+    Scans a directory recursively and computes checksums for all matching files.
+    Can either generate a checksum list file, or verify an existing list
+    against current file contents.
+
+    Args:
+        scan_path (str): Path to the directory to scan (default: ".").
+        ext_filter (str | None): Restrict to files with this extension (without dot).
+        algo (str): Hashing algorithm to use ("sha256", "md5", "sha1").
+        out_file (str | None): Path to the checksum output list file.
+            Defaults to `checksums.{algo}sum` if not specified.
+        verify (bool): If True, verify files against the list instead of generating it.
+        lang (str | None): Show localized help ("pl" or "eng") instead of running.
+
+    Raises:
+        click.Abort: If verification fails or no files are found.
+
+    Examples:
+        Generate SHA256 checksums for all files in `downloads/`:
+            $ shellman checksum_files -p downloads -a sha256 -o myhashes.sha256
+
+        Verify files against an existing checksum list:
+            $ shellman checksum_files --verify -o myhashes.sha256
+    """
     if lang:
         print_help_md(lang)
         return
@@ -94,6 +121,26 @@ def cli(scan_path, ext_filter, algo, out_file, verify, lang):
 
 
 def hash_file(file_path, hash_func):
+    """
+    Compute the checksum of a single file.
+
+    Reads the file in chunks to avoid memory issues with large files and
+    applies the given hashing function (e.g., SHA256, MD5, SHA1).
+
+    Args:
+        file_path (Path): Path to the file to hash.
+        hash_func (Callable[[], hashlib._Hash]): Hash constructor from hashlib
+            (e.g., `hashlib.sha256`).
+
+    Returns:
+        str: Hexadecimal digest of the computed checksum.
+
+    Examples:
+        >>> from pathlib import Path
+        >>> import hashlib
+        >>> hash_file(Path("data.txt"), hashlib.sha256)
+        '5d41402abc4b2a76b9719d911017c592'
+    """
     h = hash_func()
     with file_path.open("rb") as f:
         while chunk := f.read(8192):
