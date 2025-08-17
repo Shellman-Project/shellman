@@ -1,4 +1,7 @@
+import difflib
+import importlib.resources
 import click
+
 from .commands import (
     change_line_end,
     checksum_files,
@@ -20,14 +23,12 @@ from .commands import (
     dir_tree,
 )
 
-import importlib.resources
-
 try:
     VERSION = importlib.resources.files("shellman").joinpath("VERSION").read_text().strip()
 except Exception:
     VERSION = "unknown"
 
-AUTOR_INFO = """
+AUTHOR_INFO = """
 ──────────────────────────────────────────────
 Author:
   Jakub Marciniak
@@ -40,43 +41,72 @@ GitHub:
 ──────────────────────────────────────────────
 """
 
+# alias -h -> --help
+CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
+
+
 class ShellmanGroup(click.Group):
     def format_help(self, ctx, formatter):
         super().format_help(ctx, formatter)
-        click.echo(AUTOR_INFO)
+        formatter.write(AUTHOR_INFO)
 
-@click.group(cls=ShellmanGroup)
+    def get_command(self, ctx, cmd_name):
+        cmd = super().get_command(ctx, cmd_name)
+        if cmd is not None:
+            return cmd
+
+        suggestions = difflib.get_close_matches(cmd_name, self.commands.keys(), n=4, cutoff=0.5)
+        if cmd_name:
+            click.echo(f"Unknown command: {cmd_name}")
+            if suggestions:
+                click.echo("Did you mean:")
+                for s in suggestions:
+                    click.echo(f"  {s}")
+            click.echo()  
+
+        click.echo(self.get_help(ctx))
+        ctx.exit(0)  
+
+@click.group(
+    cls=ShellmanGroup,
+    context_settings=CONTEXT_SETTINGS,
+    invoke_without_command=True,
+)
 @click.version_option(version=VERSION)
-def cli():
+@click.pass_context
+def cli(ctx):
     """
     Shellman – your friendly shell assistant 💬
 
-    For command help in your lang: \n
-    shellman count_lines --lang-help pl
+    For command help in your lang:
+      shellman count_lines --lang-help pl
 
-    [Available languages: eng, pl] \n
+    [Available languages: eng, pl]
     ──────────────────────────────────────────────
     """
-    pass
+    if ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
 
-cli.add_command(file_stats.cli, name="file_stats")
-cli.add_command(find_files.cli, name="find_files")
+
+cli.add_command(file_stats.cli,   name="file_stats")
+cli.add_command(find_files.cli,   name="find_files")
 cli.add_command(checksum_files.cli, name="checksum_files")
-cli.add_command(clean_files.cli, name="clean_files")
+cli.add_command(clean_files.cli,  name="clean_files")
 cli.add_command(file_convert.cli, name="file_convert")
 cli.add_command(replace_text.cli, name="replace_text")
 cli.add_command(encrypt_files.cli, name="encrypt_files")
-cli.add_command(sys_summary.cli, name="sys_summary")
+cli.add_command(sys_summary.cli,  name="sys_summary")
 cli.add_command(change_line_end.cli, name="change_line_end")
-cli.add_command(excel.cli, name="excel")
-cli.add_command(csv_extract.cli, name="csv_extract")
+cli.add_command(excel.cli,        name="excel")
+cli.add_command(csv_extract.cli,  name="csv_extract")
 cli.add_command(json_extract.cli, name="json_extract")
-cli.add_command(date_utils.cli, name="date_utils")
-cli.add_command(zip_batch.cli, name="zip_batch")
-cli.add_command(speed_test.cli, name="speed_test")
-cli.add_command(open_ports.cli, name="open_ports")
-cli.add_command(dir_tree.cli, name="dir_tree")
-cli.add_command(lines.cli, name="lines")
+cli.add_command(date_utils.cli,   name="date_utils")
+cli.add_command(zip_batch.cli,    name="zip_batch")
+cli.add_command(speed_test.cli,   name="speed_test")
+cli.add_command(open_ports.cli,   name="open_ports")
+cli.add_command(dir_tree.cli,     name="dir_tree")
+cli.add_command(lines.cli,        name="lines")
+
 
 @cli.command(name="help")
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
@@ -84,8 +114,9 @@ def help_cmd(args):
     """Show this message and exit."""
     from click.testing import CliRunner
     runner = CliRunner()
-    result = runner.invoke(cli, ["--help"] if not args else list(args) + ["--help"])
+    result = runner.invoke(cli, (list(args) if args else []) + ["--help"])
     click.echo(result.output)
+
 
 @cli.command(name="version")
 def version_cmd():
