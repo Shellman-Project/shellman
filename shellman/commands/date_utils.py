@@ -9,13 +9,47 @@ from dateutil.relativedelta import relativedelta
 @click.command(
     help="Work with dates: add/subtract time, compare or format."
 )
-@click.option("--date", "base_date", help="Base date (default: now)", default=None)
-@click.option("--add", "add_input", help="Add duration (e.g. 5d, 3w, 2h, 10min)")
-@click.option("--sub", "sub_input", help="Subtract duration")
-@click.option("--diff", "diff_date", help="Date to compare to (diff mode)")
-@click.option("--format", "format_pattern", help="Format output using strftime")
-@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing the command")
+@click.option("--date","-d", "base_date", help="Base date (default: now)", default=None)
+@click.option("--add","-a", "add_input", help="Add duration (e.g. 5d, 3w, 2h, 10min)")
+@click.option("--sub","-s", "sub_input", help="Subtract duration")
+@click.option("--diff","-df", "diff_date", help="Date to compare to (diff mode)")
+@click.option("--format","-f", "format_pattern", help="Format output using strftime")
+@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
 def cli(base_date, add_input, sub_input, diff_date, format_pattern, lang):
+    """
+    Command-line tool for date and time calculations.
+
+    Supports:
+      • Parsing a base date (or using current time by default).
+      • Adding or subtracting durations (days, weeks, months, years, hours, etc.).
+      • Calculating the difference between two dates.
+      • Formatting dates using strftime patterns.
+
+    Args:
+        base_date (str | None): Base date as "YYYY-MM-DD" or "YYYY-MM-DD HH:MM:SS".
+            Defaults to now if not provided.
+        add_input (str | None): Duration to add (e.g. "5d", "3w", "2h", "10min").
+        sub_input (str | None): Duration to subtract in the same format as `add_input`.
+        diff_date (str | None): Second date to compare to base date.
+        format_pattern (str | None): Output format (strftime).
+        lang (str | None): Show localized help ("pl" or "eng") instead of executing.
+
+    Raises:
+        click.ClickException: If date parsing fails, or invalid duration format/unit is given.
+
+    Examples:
+        Add 7 days to current date:
+            $ shellman date_utils --add 7d
+
+        Subtract 2 months from a given date:
+            $ shellman date_utils -d "2025-01-15" --sub 2m
+
+        Compare two dates:
+            $ shellman date_utils -d "2025-01-01" --diff "2025-01-10"
+
+        Format output date:
+            $ shellman date_utils --add 1y --format "%A, %d %B %Y"
+    """
     if lang:
         print_help_md(lang)
         return
@@ -98,6 +132,7 @@ def cli(base_date, add_input, sub_input, diff_date, format_pattern, lang):
 
 
 def print_help_md(lang="eng"):
+    """Print localized help text for the `date_utils` command."""
     lang_file = f"help_{lang.lower()}.md"
     try:
         help_path = importlib.resources.files("shellman").joinpath(f"help_texts/date_utils/{lang_file}")
