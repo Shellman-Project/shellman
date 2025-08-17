@@ -23,6 +23,39 @@ import click
 )
 @click.option("--lang-help", "lang", help="Show localized help (pl, eng)")
 def cli(path, files, depth, output, hidden, ascii, exclude, lang):
+    """
+    Print a visual tree of directories and (optionally) files.
+
+    Supports configurable recursion depth, exclusion patterns, hidden files,
+    ASCII/Unicode output styles, and saving results to a file.
+
+    Args:
+        path (str): Root directory to start from. Defaults to current dir.
+        files (bool): If True, include files as well as folders.
+        depth (int | None): Limit recursion depth (None = no limit).
+        output (str | None): Save tree output to this file instead of printing.
+        hidden (bool): If True, include hidden files/folders (starting with ".").
+        ascii (bool): If True, use ASCII characters instead of Unicode box drawing.
+        exclude (list[str]): Glob patterns of files/folders to exclude
+            (e.g., `__pycache__`, `*.pyc`, `*.log`).
+        lang (str | None): Show localized help ("pl", "eng") instead of executing.
+
+    Effects:
+        - Prints directory tree to stdout or writes to file.
+
+    Examples:
+        Show directory tree including files:
+            $ shellman dir_tree ./src -f
+
+        Limit depth to 2 and use ASCII lines:
+            $ shellman dir_tree ./project -d 2 -a
+
+        Exclude cache and .log files:
+            $ shellman dir_tree ./data -x __pycache__ -x "*.log"
+
+        Save tree to file:
+            $ shellman dir_tree ./src -o tree.txt
+    """
     if lang:
         _print_help_md(lang)
         return
@@ -40,6 +73,31 @@ def cli(path, files, depth, output, hidden, ascii, exclude, lang):
 
 
 def _build_tree(root: Path, include_files: bool, max_depth: int, show_hidden: bool, ascii_mode: bool, exclude_patterns):
+    """
+    Recursively build a directory tree representation.
+
+    Args:
+        root (Path): Root directory to traverse.
+        include_files (bool): Whether to include files in output.
+        max_depth (int | None): Maximum recursion depth (None = unlimited).
+        show_hidden (bool): If True, include hidden files/folders.
+        ascii_mode (bool): If True, use ASCII characters instead of Unicode.
+        exclude_patterns (list[str]): Glob patterns of files/folders to skip.
+
+    Returns:
+        str: The formatted directory tree as a multi-line string.
+
+    Notes:
+        - Always starts with the root folder as the top node.
+        - Exclusion is checked by both name and full path.
+
+    Example:
+        >>> from pathlib import Path
+        >>> print(_build_tree(Path("."), True, 1, False, False, []))
+        project/
+        ├── README.md
+        └── src/
+    """
     lines = []
 
     def is_excluded(entry: Path) -> bool:
@@ -78,6 +136,7 @@ def _build_tree(root: Path, include_files: bool, max_depth: int, show_hidden: bo
 
 
 def _print_help_md(lang: str):
+    """Print localized help text for the `dir_tree` command."""
     lang_file = f"help_{lang.lower()}.md"
     try:
         help_path = importlib.resources.files("shellman").joinpath(
