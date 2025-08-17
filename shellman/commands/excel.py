@@ -30,6 +30,19 @@ def _print_help_md(sub: str, lang: str = "eng"):
 # -------- main click group ------------------------------------------------- #
 @click.group(help="Excel utilities: sheet info, quick preview and CSV export.")
 def cli():
+    """
+    Group of Excel-related utilities.
+
+    Provides three subcommands:
+      - `info`:    Show sheet names with row/column counts.
+      - `preview`: Preview first N rows / selected columns.
+      - `export`:  Export sheets or ranges to CSV.
+
+    Usage:
+        $ shellman excel info file.xlsx
+        $ shellman excel preview file.xlsx --rows 10 --columns A-C
+        $ shellman excel export file.xlsx -s Sheet1 -o ./csv
+    """
     pass
 
 
@@ -42,6 +55,21 @@ def cli():
     help="Show localized help (pl, eng) instead of executing the command",
 )
 def info(file, lang):
+    """
+    Show all sheets in an Excel workbook with row and column counts.
+
+    Args:
+        file (str): Path to the Excel file.
+        lang (str | None): Show localized help ("pl", "eng") instead of executing.
+
+    Raises:
+        click.UsageError: If no file is provided.
+        click.ClickException: If the file cannot be read.
+
+    Examples:
+        $ shellman excel info report.xlsx
+        $ shellman excel info data.xlsb
+    """
     if lang:
         _print_help_md("info", lang)
         return
@@ -82,6 +110,34 @@ def info(file, lang):
 )
 @click.option("--lang-help", "lang", help="Show localized help (pl, eng)")
 def preview(file, sheet, rows, columns, output, interactive, info, lang):
+    """
+    Preview the first N rows of an Excel sheet, optionally filtering columns.
+
+    Args:
+        file (str): Path to the Excel file.
+        sheet (str): Sheet number (1-based) or sheet name. Default = "1".
+        rows (int): Number of rows to preview. Default = 20.
+        columns (str | None): Column letters (e.g. "A,C-E").
+        output (str | None): Save preview to a file instead of printing.
+        interactive (bool): If True, pipe result to pager (`less -S`).
+        info (bool): If True, display column headers and row numbers
+            with aligned formatting and '|' separator.
+        lang (str | None): Show localized help ("pl", "eng").
+
+    Raises:
+        click.UsageError: If no file is provided.
+        click.ClickException: If sheet reference is invalid.
+
+    Examples:
+        Preview first 10 rows:
+            $ shellman excel preview data.xlsx --rows 10
+
+        Show only columns A–C:
+            $ shellman excel preview data.xlsx --columns A-C
+
+        Save preview to CSV:
+            $ shellman excel preview data.xlsx --rows 5 --output preview.csv
+    """
     if lang:
         _print_help_md("preview", lang)
         return
@@ -183,19 +239,48 @@ def preview(file, sheet, rows, columns, output, interactive, info, lang):
 # ======================  export  ========================================== #
 @cli.command("export", help="Export sheets or ranges of an Excel file to CSV.")
 @click.argument("file", required=False)
-@click.option("--sheets", multiple=True, help="Sheet names or indexes")
-@click.option("--rows", help="Row range start-end")
-@click.option("--columns", help="Column letters (e.g. A,B-D)")
+@click.option("--sheets","-s", multiple=True, help="Sheet names or indexes")
+@click.option("--rows","-r", help="Row range start-end")
+@click.option("--columns","-c", help="Column letters (e.g. A,B-D)")
 @click.option(
     "--out",
+    "-o",
     "out_dir",
     type=click.Path(),
     default="csv",
     help="Output directory",
 )
-@click.option("--overwrite", is_flag=True, help="Overwrite CSVs without timestamp")
-@click.option("--lang-help", "lang", help="Show localized help (pl, eng)")
+@click.option("--overwrite","-ow", is_flag=True, help="Overwrite CSVs without timestamp")
+@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng)")
 def export(file, sheets, rows, columns, out_dir, overwrite, lang):
+    """
+    Export sheets or ranges from an Excel file to CSV files.
+
+    Args:
+        file (str): Path to the Excel file.
+        sheets (list[str]): Specific sheet names or indexes to export.
+            If omitted, all sheets are exported.
+        rows (str | None): Row range in format "start-end".
+        columns (str | None): Column letters or ranges (e.g. "A,B-D").
+        out_dir (str): Output directory for CSVs. Default = "./csv".
+        overwrite (bool): If True, overwrite CSV names without timestamp.
+            If False, append a timestamp to filenames.
+        lang (str | None): Show localized help ("pl", "eng").
+
+    Raises:
+        click.UsageError: If no file is provided.
+        click.ClickException: If row/column specs are invalid.
+
+    Examples:
+        Export all sheets:
+            $ shellman excel export workbook.xlsx
+
+        Export only Sheet1 and rows 1–10:
+            $ shellman excel export workbook.xlsx -s Sheet1 -r 1-10
+
+        Export with column filter:
+            $ shellman excel export workbook.xlsx -s Sheet2 -c A-C
+    """
     if lang:
         _print_help_md("export", lang)
         return
