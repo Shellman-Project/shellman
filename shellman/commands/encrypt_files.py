@@ -14,18 +14,21 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 )
 @click.option(
     "--mode",
-    required=False,  # sprawdzane ręcznie
+    "-m",
+    required=False,
     type=click.Choice(["encrypt", "decrypt"]),
     help="Operation mode (required unless using --lang-help)",
 )
 @click.option(
     "--password",
-    required=False,  # sprawdzane ręcznie
+    "-pas",
+    required=False,
     help="Password to encrypt/decrypt (required unless using --lang-help)",
 )
 @click.option("--ext", help="Only process files with this extension")
 @click.option(
     "--path",
+    "-p",
     "scan_path",
     type=click.Path(exists=True, file_okay=False),
     default=".",
@@ -34,16 +37,45 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 @click.option("--out", "out_dir", type=click.Path(), help="Output directory")
 @click.option(
     "--lang-help",
+    "-lh",
     "lang",
     help="Show localized help (pl, eng) instead of executing the command",
 )
 def cli(mode, password, ext, scan_path, out_dir, lang):
-    # --lang-help: pokaż markdown i wyjdź
+    """
+    Encrypt or decrypt files using AES-256 with a password.
+
+    Recursively scans a directory for matching files (by extension),
+    then encrypts or decrypts them. Encrypted files are saved with
+    `.enc` extension, decrypted files restore the original name.
+
+    Args:
+        mode (str): Operation mode: "encrypt" or "decrypt".
+        password (str): Password used to derive the AES key.
+        ext (str | None): Only include files with this extension.
+        scan_path (str): Directory to scan. Defaults to current dir.
+        out_dir (str | None): Directory to write results.
+            Defaults to "encrypted/" or "decrypted/" depending on mode.
+        lang (str | None): Show localized help ("pl", "eng") instead of executing.
+
+    Raises:
+        click.UsageError: If `--mode` or `--password` is missing.
+
+    Effects:
+        - Creates an output directory if not existing.
+        - Processes matching files and writes encrypted/decrypted versions.
+
+    Examples:
+        Encrypt all `.txt` files:
+            $ shellman encrypt_files --mode encrypt --password secret --ext txt
+
+        Decrypt previously encrypted files:
+            $ shellman encrypt_files --mode decrypt --password secret --ext txt --path encrypted
+    """
     if lang:
         print_help_md(lang)
         return
 
-    # Ręczna walidacja wymaganych opcji
     if not mode:
         raise click.UsageError("Missing required option '--mode'")
     if not password:
@@ -84,6 +116,18 @@ def cli(mode, password, ext, scan_path, out_dir, lang):
 
 # ---------- AES-256-CBC helpers ---------- #
 def derive_key(password: str, salt: bytes) -> bytes:
+    """Derive a 256-bit AES key from a password and salt using PBKDF2-HMAC-SHA256.
+
+    Args:
+        password (str): Input password string.
+        salt (bytes): Random salt (16 bytes recommended).
+
+    Returns:
+        bytes: 32-byte derived key.
+
+    Notes:
+        - Uses 100,000 PBKDF2 iterations for stronger resistance
+          against brute-force attacks."""
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,
@@ -95,6 +139,23 @@ def derive_key(password: str, salt: bytes) -> bytes:
 
 
 def encrypt_file(data: bytes, password: str) -> bytes:
+    """
+    Encrypt a byte string using AES-256-CBC with PKCS7 padding.
+
+    Args:
+        data (bytes): Plaintext data to encrypt.
+        password (str): Password for key derivation.
+
+    Returns:
+        bytes: Encrypted data in format: salt|iv|ciphertext
+
+    Process:
+        - Generate random 16-byte salt and IV.
+        - Derive a 256-bit key from password+salt.
+        - Apply PKCS7 padding to data.
+        - Encrypt with AES-256-CBC.
+        - Concatenate salt, IV, and ciphertext.
+    """
     salt = secrets.token_bytes(16)
     key = derive_key(password, salt)
     iv = secrets.token_bytes(16)
@@ -106,10 +167,26 @@ def encrypt_file(data: bytes, password: str) -> bytes:
     encryptor = cipher.encryptor()
     ciphertext = encryptor.update(padded_data) + encryptor.finalize()
 
-    return salt + iv + ciphertext  # zapis: salt|iv|ciphertext
+    return salt + iv + ciphertext  # salt|iv|ciphertext
 
 
 def decrypt_file(data: bytes, password: str) -> bytes:
+    """
+    Decrypt AES-256-CBC encrypted data produced by `encrypt_file`.
+
+    Args:
+        data (bytes): Encrypted data (salt|iv|ciphertext).
+        password (str): Password for key derivation.
+
+    Returns:
+        bytes: Decrypted plaintext data.
+
+    Process:
+        - Extract salt (first 16 bytes) and IV (next 16 bytes).
+        - Derive AES key using PBKDF2-HMAC-SHA256.
+        - Decrypt ciphertext with AES-256-CBC.
+        - Remove PKCS7 padding.
+    """
     salt = data[:16]
     iv = data[16:32]
     ciphertext = data[32:]
@@ -125,6 +202,7 @@ def decrypt_file(data: bytes, password: str) -> bytes:
 
 # ---------- Localized help loader ---------- #
 def print_help_md(lang: str = "eng"):
+    """Print localized help text for the `encrypt_files` command."""
     lang_file = f"help_{lang.lower()}.md"
     try:
         help_path = importlib.resources.files("shellman").joinpath(
