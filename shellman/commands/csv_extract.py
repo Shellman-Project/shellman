@@ -9,16 +9,56 @@ import click
     help="Extracts specific columns or rows from a CSV file with filtering options."
 )
 @click.argument("file", required=False)
-@click.option("--cols", required=False, help="Columns to keep (1-based), e.g. 1,3 or 2-4")
-@click.option("--rows", help="Rows to keep (after header), e.g. 2-10")
-@click.option("--contains", help="Only keep rows containing this text")
-@click.option("--not-contains", "not_contains", help="Only keep rows NOT containing this text")
-@click.option("--delim", default=",", help="CSV delimiter (default: ,)")
-@click.option("--skip-header", is_flag=True, default=False, help="Skip first line (header)")
-@click.option("--output", type=click.Path(), help="Save result instead of printing")
-@click.option("--interactive", is_flag=True, default=False, help="Pipe result to less")
-@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing the command")
+@click.option("--cols","-c", required=False, help="Columns to keep (1-based), e.g. 1,3 or 2-4")
+@click.option("--rows","-r", help="Rows to keep (after header), e.g. 2-10")
+@click.option("--contains","-con", help="Only keep rows containing this text")
+@click.option("--not-contains","-ncon", "not_contains", help="Only keep rows NOT containing this text")
+@click.option("--delim","-d", default=",", help="CSV delimiter (default: ,)")
+@click.option("--skip-header","-sh", is_flag=True, default=False, help="Skip first line (header)")
+@click.option("--output","-o", type=click.Path(), help="Save result instead of printing")
+@click.option("--interactive","-i", is_flag=True, default=False, help="Pipe result to less")
+@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
 def cli(file, cols, rows, contains, not_contains, delim, skip_header, output, interactive, lang):
+    """
+    Extract specific columns or rows from a CSV file with optional filtering.
+
+    Supports selecting columns by index (1-based), row ranges, and
+    filtering by text presence or absence. Results can be printed,
+    paged interactively, or saved to a file.
+
+    Args:
+        file (str): Path to the CSV file.
+        cols (str): Comma-separated list of columns to keep (1-based).
+            Supports ranges, e.g. "1,3" or "2-4".
+        rows (str | None): Comma-separated list of rows (after header) to keep.
+            Supports ranges.
+        contains (str | None): Only include rows containing this text.
+        not_contains (str | None): Only include rows NOT containing this text.
+        delim (str): CSV delimiter (default: ",").
+        skip_header (bool): If True, skip the first line (header).
+        output (str | None): Path to save the extracted data instead of printing.
+        interactive (bool): If True, pipe output to pager (`less`).
+        lang (str | None): Show localized help ("pl" or "eng") instead of running.
+
+    Raises:
+        click.UsageError:
+            - If `file` or `--cols` are missing.
+            - If both `--contains` and `--not-contains` are provided.
+
+    Effects:
+        - Prints selected CSV content to stdout.
+        - Optionally saves to a file or displays interactively.
+
+    Examples:
+        Extract only first and third column:
+            $ shellman csv_extract data.csv --cols 1,3
+
+        Extract rows 2–10, skipping header:
+            $ shellman csv_extract data.csv --cols 1,2 --rows 2-10 --skip-header
+
+        Save filtered output to file:
+            $ shellman csv_extract data.csv --cols 1-3 --contains error --output out.csv
+    """
     if lang:
         print_help_md(lang)
         return
@@ -80,6 +120,7 @@ def cli(file, cols, rows, contains, not_contains, delim, skip_header, output, in
 
 
 def print_help_md(lang="eng"):
+    """Print localized help text for the `csv_extract` command."""
     lang_file = f"help_{lang.lower()}.md"
     try:
         help_path = importlib.resources.files("shellman").joinpath(f"help_texts/csv_extract/{lang_file}")
