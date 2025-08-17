@@ -11,10 +11,10 @@ import click
     help="Show full path, file size, line-count and extension for each file."
 )
 @click.argument("inputs", nargs=-1)
-@click.option("--ext", help="Only include files with this extension")
-@click.option("--meta", is_flag=True, help="Include file metadata (created, modified, type, encoding)")
-@click.option("--output", is_flag=True, help="Save results to logs/file_stats_<timestamp>.log")
-@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing")
+@click.option("--ext","-e", help="Only include files with this extension")
+@click.option("--meta","-m", is_flag=True, help="Include file metadata (created, modified, type, encoding)")
+@click.option("--output","-o", is_flag=True, help="Save results to logs/file_stats_<timestamp>.log")
+@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing")
 def cli(inputs, ext, meta, output, lang):
     if lang:
         _print_help_md(lang)
