@@ -1,8 +1,10 @@
-from click.testing import CliRunner
-from shellman.commands.excel_to_csv import cli
-from openpyxl import Workbook
-from pathlib import Path
 import csv
+from pathlib import Path
+
+from click.testing import CliRunner
+from openpyxl import Workbook
+
+from shellman.commands.excel_to_csv import cli
 
 
 def create_xlsx(path: Path):

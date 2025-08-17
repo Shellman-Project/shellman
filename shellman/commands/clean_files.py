@@ -1,7 +1,7 @@
+import importlib.resources
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
-import importlib.resources
 
 import click
 

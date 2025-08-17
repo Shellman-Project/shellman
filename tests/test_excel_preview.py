@@ -1,8 +1,10 @@
-from click.testing import CliRunner
-from shellman.commands.excel_preview import cli
-from openpyxl import Workbook
-from pathlib import Path
 import csv
+from pathlib import Path
+
+from click.testing import CliRunner
+from openpyxl import Workbook
+
+from shellman.commands.excel_preview import cli
 
 
 def create_test_workbook(path: Path):
