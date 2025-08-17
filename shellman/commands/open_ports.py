@@ -5,15 +5,17 @@ Show open TCP/UDP ports and physical serial/parallel ports with process info and
 Works on Linux, macOS, and Windows. Requires `psutil` and `pyserial` for full serial port info.
 """
 
-import sys
-import platform
-import subprocess
-import os
-import socket
-import shutil
 import importlib.resources
 import json as _json
+import os
+import platform
+import shutil
+import socket
+import subprocess
+import sys
+
 import click
+
 
 @click.command(
     help="Show currently open TCP/UDP ports and serial ports (COM/LPT/tty) with process, PID, state, and device name."

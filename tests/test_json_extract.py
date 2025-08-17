@@ -1,7 +1,9 @@
-from click.testing import CliRunner
-from shellman.commands.json_extract import cli
-from pathlib import Path
 import json
+from pathlib import Path
+
+from click.testing import CliRunner
+
+from shellman.commands.json_extract import cli
 
 
 def create_json_file(path: Path):

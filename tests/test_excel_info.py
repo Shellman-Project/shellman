@@ -1,7 +1,9 @@
-from click.testing import CliRunner
-from shellman.commands.excel_info import cli
-from openpyxl import Workbook
 from pathlib import Path
+
+from click.testing import CliRunner
+from openpyxl import Workbook
+
+from shellman.commands.excel_info import cli
 
 
 def create_workbook(path: Path, sheets: dict):

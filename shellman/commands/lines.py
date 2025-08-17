@@ -1,10 +1,11 @@
-from pathlib import Path
-import re
-import os
-from datetime import datetime
 import importlib.resources
+import os
+import re
+from datetime import datetime
+from pathlib import Path
 
 import click
+
 
 @click.command(
     help="Extract, count or summarize lines in files or folders with powerful filters and context options."

@@ -25,7 +25,7 @@ shellman = "shellman.cli:cli"
 packages = ["shellman"]
 
 [tool.ruff]
-line-length = 88
+line-length = 250
 target-version = "py311"  # lub twój Python
 
 [tool.ruff.lint]
