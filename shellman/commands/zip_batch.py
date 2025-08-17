@@ -1,8 +1,8 @@
-from pathlib import Path
-from datetime import datetime
-import subprocess
 import importlib.resources
 import os
+import subprocess
+from datetime import datetime
+from pathlib import Path
 
 import click
 

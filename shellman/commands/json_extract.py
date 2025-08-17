@@ -1,6 +1,6 @@
-from pathlib import Path
-import json
 import importlib.resources
+import json
+from pathlib import Path
 
 import click
 

@@ -1,11 +1,11 @@
-from pathlib import Path
+import importlib.resources
 import json
 import os
-import importlib.resources
+from pathlib import Path
 
 import click
-import yaml
 import toml
+import yaml
 
 
 @click.command(

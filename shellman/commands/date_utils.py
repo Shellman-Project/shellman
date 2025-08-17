@@ -1,8 +1,9 @@
-import click
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
 import importlib.resources
 import re
+from datetime import datetime, timedelta
+
+import click
+from dateutil.relativedelta import relativedelta
 
 
 @click.command(
