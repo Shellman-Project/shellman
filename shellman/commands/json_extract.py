@@ -9,12 +9,12 @@ import click
     help="Extract and filter JSON data with optional field selection."
 )
 @click.argument("file", required=False)
-@click.option("--path", "path_expr", help="Dot-separated key path to list/obj, e.g. 'items' or 'root.nested.items'")
-@click.option("--filter", "filter_expr", help="Filter: key=value to match (string compare)")
-@click.option("--fields", help="Comma-separated list of fields to include in output")
-@click.option("--output", "output_file", type=click.Path(), help="Save result to file")
-@click.option("--interactive", is_flag=True, help="Pipe result through pager")
-@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing")
+@click.option("--path","-p", "path_expr", help="Dot-separated key path to list/obj, e.g. 'items' or 'root.nested.items'")
+@click.option("--filter","-fl", "filter_expr", help="Filter: key=value to match (string compare)")
+@click.option("--fields","-fld", help="Comma-separated list of fields to include in output")
+@click.option("--output","-o", "output_file", type=click.Path(), help="Save result to file")
+@click.option("--interactive","-i", is_flag=True, help="Pipe result through pager")
+@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing")
 def cli(file, path_expr, filter_expr, fields, output_file, interactive, lang):
     # ---------- lokalizowana pomoc ---------- #
     if lang:
