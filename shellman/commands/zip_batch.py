@@ -10,34 +10,31 @@ import click
 @click.command(
     help="Create zip archives from folders or files in batch."
 )
-@click.option("--path", "src_path",
+@click.option("--path","-p", "src_path",
               type=click.Path(exists=True, file_okay=False),
               default=".",
               help="Source directory to scan (default: current dir)")
 
-@click.option("--ext", help="Only include files with this extension")
-@click.option("--per-folder", is_flag=True, help="Create one archive per immediate sub-folder")
-@click.option("--output", "out_dir",
+@click.option("--ext","-e", help="Only include files with this extension")
+@click.option("--per-folder","-pf", is_flag=True, help="Create one archive per immediate sub-folder")
+@click.option("--output","-o", "out_dir",
               type=click.Path(),
               default="./zips",
               help="Output directory (default: ./zips)")
 
-@click.option("--name", "name_prefix", default="batch_", help="Prefix for archive name")
-@click.option("--password", help="Password for zip (uses `zip -P` – weak encryption!)")
-@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing")
+@click.option("--name","-n", "name_prefix", default="batch_", help="Prefix for archive name")
+@click.option("--password","-pass", help="Password for zip (uses `zip -P` – weak encryption!)")
+@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing")
 def cli(src_path, ext, per_folder, out_dir, name_prefix, password, lang):
-    # ---------- lokalizowana pomoc ---------- #
     if lang:
         _print_help_md(lang)
         return
 
-    # ---------- przygotowanie ---------- #
     src_path = Path(src_path)
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     if per_folder:
-        # jedno archiwum na każdy katalog bezpośredni
         for sub in src_path.iterdir():
             if not sub.is_dir():
                 continue
@@ -49,7 +46,6 @@ def cli(src_path, ext, per_folder, out_dir, name_prefix, password, lang):
             subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             click.secho(f"Created: {zipfile}", fg="green")
     else:
-        # jedno archiwum ze wszystkich plików (ew. filtrowane po rozszerzeniu)
         files = [
             f for f in src_path.rglob("*")
             if f.is_file() and (not ext or f.suffix == f".{ext}")

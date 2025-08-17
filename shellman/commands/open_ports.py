@@ -20,11 +20,11 @@ import click
 @click.command(
     help="Show currently open TCP/UDP ports and serial ports (COM/LPT/tty) with process, PID, state, and device name."
 )
-@click.option("--proto", type=click.Choice(["tcp", "udp"]), help="Filter by protocol")
-@click.option("--port", type=int, help="Filter by local port number")
-@click.option("--json", "json_out", is_flag=True, help="Output raw JSON (TCP/UDP only)")
-@click.option("--serial", is_flag=True, help="List physical serial/parallel ports (COM/LPT/tty) with device description")
-@click.option("--lang-help", "lang", help="Show localized help (pl, eng)")
+@click.option("--proto","-pro", type=click.Choice(["tcp", "udp"]), help="Filter by protocol")
+@click.option("--port","-p", type=int, help="Filter by local port number")
+@click.option("--json","-j", "json_out", is_flag=True, help="Output raw JSON (TCP/UDP only)")
+@click.option("--serial","-s", is_flag=True, help="List physical serial/parallel ports (COM/LPT/tty) with device description")
+@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng)")
 def cli(proto, port, json_out, serial, lang):
     if lang:
         _print_help_md(lang)

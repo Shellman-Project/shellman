@@ -16,13 +16,13 @@ import click
 @click.command(
     help="Run a quick internet speed test (download, upload, ping)."
 )
-@click.option("--json", "json_out", is_flag=True, help="Output raw JSON result")
+@click.option("--json","-j", "json_out", is_flag=True, help="Output raw JSON result")
 @click.option(
-    "--only",
+    "--only","-o","only",
     type=click.Choice(["download", "upload", "ping"]),
     help="Show only a single metric",
 )
-@click.option("--lang-help", "lang", help="Show localized help (pl, eng)")
+@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng)")
 def cli(json_out, only, lang):
     if lang:
         _print_help_md(lang)
