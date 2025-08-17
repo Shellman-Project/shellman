@@ -1,7 +1,9 @@
 import os
-from click.testing import CliRunner
-from shellman.commands.merge_files import cli
 from pathlib import Path
+
+from click.testing import CliRunner
+
+from shellman.commands.merge_files import cli
 
 
 def create_file(path: Path, content: str):

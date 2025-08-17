@@ -1,8 +1,9 @@
+import fnmatch
+import importlib.resources
 import os
 from pathlib import Path
-import fnmatch
+
 import click
-import importlib.resources
 
 
 @click.command(

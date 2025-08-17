@@ -1,6 +1,8 @@
-from click.testing import CliRunner
-from shellman.commands.csv_extract import cli
 from pathlib import Path
+
+from click.testing import CliRunner
+
+from shellman.commands.csv_extract import cli
 
 
 def create_csv(path: Path):

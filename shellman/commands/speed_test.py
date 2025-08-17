@@ -3,12 +3,12 @@
 Cross-platform internet speed test (download / upload / ping).
 Falls back through: Ookla binary → speedtest-cli binary → python speedtest-cli.
 """
-from pathlib import Path
-import subprocess
-import sys
-import shutil
 import importlib.resources
 import json as _json
+import shutil
+import subprocess
+import sys
+from pathlib import Path
 
 import click
 

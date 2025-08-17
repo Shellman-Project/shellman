@@ -1,6 +1,7 @@
 import hashlib
-from pathlib import Path
 import importlib.resources
+from pathlib import Path
+
 import click
 
 SUPPORTED_ALGOS = {

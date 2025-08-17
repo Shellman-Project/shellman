@@ -1,10 +1,12 @@
+import importlib.resources
 import os
 from pathlib import Path
-import importlib.resources
+
 import click
 
 
 def print_help_md(lang="eng"):
+    """Print localized help text for the `change_line_end` command."""
     lang_file = f"help_{lang.lower()}.md"
     try:
         help_path = importlib.resources.files("shellman").joinpath(f"help_texts/change_line_end/{lang_file}")
@@ -17,13 +19,40 @@ def print_help_md(lang="eng"):
 @click.command(
     help="Convert or check LF/CRLF line endings in files or folders."
 )
-@click.option("--file", "file_path", type=click.Path(exists=True, dir_okay=False), help="Path to a single file")
-@click.option("--dir", "dir_path", type=click.Path(exists=True, file_okay=False), help="Path to directory (will recurse)")
-@click.option("--ext", help="Only process files with this extension (requires --dir)")
-@click.option("--to", "target", type=click.Choice(["lf", "crlf"]), help="Convert to specified line endings")
-@click.option("--check", "check_mode", is_flag=True, help="Only check and report line ending type per file")
-@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing the command")
+@click.option("--file", "-f", "file_path", type=click.Path(exists=True, dir_okay=False), help="Path to a single file")
+@click.option("--dir", "-d", "dir_path", type=click.Path(exists=True, file_okay=False), help="Path to directory (will recurse)")
+@click.option("--ext", "-x", help="Only process files with this extension (requires --dir)")
+@click.option("--to", "-t", "target", type=click.Choice(["lf", "crlf"]), help="Convert to specified line endings")
+@click.option("--check", "-c", "check_mode", is_flag=True, help="Only check and report line ending type per file")
+@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
 def cli(file_path, dir_path, ext, target, check_mode, lang):
+    """
+    Command-line interface for converting or checking line endings (LF/CRLF).
+
+    Supports scanning a single file or recursively processing a directory. 
+    Can either convert line endings to the specified style or check/report 
+    the current type per file.
+
+    Args:
+        file_path (str | None): Path to a single file (exclusive with `dir_path`).
+        dir_path (str | None): Path to a directory (recursive search).
+        ext (str | None): Only process files with this extension (requires `--dir`).
+        target (str | None): Desired line endings ("lf" or "crlf"). 
+            Required unless `check_mode` is used.
+        check_mode (bool): If True, only report detected line endings per file.
+        lang (str | None): Print localized help ("pl", "eng") instead of executing.
+
+    Raises:
+        click.UsageError: If neither `--to` nor `--check` is provided, 
+            or if neither `--file` nor `--dir` is specified.
+
+    Examples:
+        Check endings in a file:
+            $ shellman change_line_end --file script.py --check
+
+        Convert all `.txt` files in a folder to LF:
+            $ shellman change_line_end --dir ./docs --ext txt --to lf
+    """
     if lang:
         print_help_md(lang)
         return
@@ -54,6 +83,22 @@ def cli(file_path, dir_path, ext, target, check_mode, lang):
 
 
 def detect_endings(path: Path) -> str:
+    """
+    Detect the type of line endings in a file.
+
+    Reads the file as bytes and determines whether the file uses:
+    - LF (`\n`)
+    - CRLF (`\r\n`)
+    - MIXED (both LF and CRLF in the same file)
+    - NONE (no line endings found)
+    - ERROR (if the file could not be read)
+
+    Args:
+        path (Path): Path to the file to inspect.
+
+    Returns:
+        str: One of {"LF", "CRLF", "MIXED", "NONE", "ERROR"}.
+    """
     try:
         with path.open("rb") as f:
             content = f.read()
@@ -69,6 +114,23 @@ def detect_endings(path: Path) -> str:
 
 
 def convert_endings(path: Path, to: str):
+    """
+    Convert the line endings of a file to LF or CRLF.
+
+    Reads the file in binary mode, normalizes its line endings, and writes 
+    the converted result back to the same file.
+
+    Args:
+        path (Path): Path to the file to convert.
+        to (str): Target format, either "lf" or "crlf".
+
+    Effects:
+        - Overwrites the file with converted line endings.
+        - Prints a success message or error to the console.
+
+    Raises:
+        Exception: If the file cannot be read or written.
+    """
     try:
         content = path.read_bytes()
         if to == "lf":

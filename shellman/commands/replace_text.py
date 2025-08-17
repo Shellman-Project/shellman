@@ -1,6 +1,6 @@
-from pathlib import Path
 import difflib
 import importlib.resources
+from pathlib import Path
 
 import click
 

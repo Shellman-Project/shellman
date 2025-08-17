@@ -1,11 +1,12 @@
+import importlib.resources
 import os
 import platform
 import shutil
 import socket
 import subprocess
-import importlib.resources
 
 import click
+
 
 def _is_git_bash():
     # Sprawdza czy działa w Git Bash na Windows
