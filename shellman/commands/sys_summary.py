@@ -9,7 +9,6 @@ import click
 
 
 def _is_git_bash():
-    # Sprawdza czy działa w Git Bash na Windows
     return (os.name == "nt" and (
         "MSYSTEM" in os.environ or
         "GIT_INSTALL_ROOT" in os.environ or
@@ -20,7 +19,7 @@ def _is_git_bash():
 @click.command(
     help="Show system, shell and tool environment summary."
 )
-@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing")
+@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing")
 def cli(lang):
     if lang:
         _print_help_md(lang)

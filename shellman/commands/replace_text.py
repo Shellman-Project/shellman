@@ -9,17 +9,17 @@ import click
     help="Replace occurrences of text in multiple files with optional preview and confirmation."
 )
 @click.argument("search_path", required=False)
-@click.option("--find", "find_text",
+@click.option("--find","-f", "find_text",
               required=False,
               help="Text to find (required unless using --lang-help)")
-@click.option("--replace", "replace_text",
+@click.option("--replace","-r", "replace_text",
               required=False,
               help="Replacement text (required unless using --lang-help)")
-@click.option("--ext", help="Only process files with this extension")
-@click.option("--in-place", is_flag=True, help="Write changes back to files")
-@click.option("--preview", is_flag=True, help="Show unified diff preview")
-@click.option("--confirm", is_flag=True, help="Ask before replacing in each file")
-@click.option("--lang-help", "lang", help="Show localized help (pl, eng) instead of executing")
+@click.option("--ext","-e", help="Only process files with this extension")
+@click.option("--in-place","-ip", is_flag=True, help="Write changes back to files")
+@click.option("--preview","-p", is_flag=True, help="Show unified diff preview")
+@click.option("--confirm","-c", is_flag=True, help="Ask before replacing in each file")
+@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing")
 def cli(search_path, find_text, replace_text, ext, in_place, preview, confirm, lang):
     # ---------- pomoc .md ---------- #
     if lang:
