@@ -46,11 +46,41 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 
 class ShellmanGroup(click.Group):
+    """
+    Custom Click command group for Shellman.
+
+    Extends `click.Group` to:
+      - Append project author/contact info to the help output.
+      - Override `get_command` so that unknown commands trigger
+        the general help display with suggestions, instead of raising
+        a fatal "No such command" error.
+    """
     def format_help(self, ctx, formatter):
+        """
+        Extend the default help formatter with author information.
+
+        Args:
+          ctx (click.Context): Current Click context.
+          formatter (click.HelpFormatter): Formatter used to render help text.
+        """
         super().format_help(ctx, formatter)
         formatter.write(AUTHOR_INFO)
 
     def get_command(self, ctx, cmd_name):
+        """
+        Resolve a subcommand by name, with fallback for unknown commands.
+
+          - If the command exists, returns it as usual.
+          - If not, prints a message with closest matches and shows the global help.
+            Exits with code 0 (no error).
+
+        Args:
+          ctx (click.Context): Current Click context.
+          cmd_name (str): The command name provided by the user.
+
+        Returns:
+          click.Command | None: Resolved command object, or None if handled as fallback.
+        """
         cmd = super().get_command(ctx, cmd_name)
         if cmd is not None:
             return cmd
