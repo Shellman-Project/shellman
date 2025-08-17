@@ -15,7 +15,7 @@ dependencies = [
     "chardet",
     "pyserial",
     "psutil",
-    "wmi",
+    "wmi; sys_platform == 'win32'",  # only install on Windows
 ]
 
 [project.scripts]
