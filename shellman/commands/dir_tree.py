@@ -1,6 +1,5 @@
 import fnmatch
 import importlib.resources
-import os
 from pathlib import Path
 
 import click
@@ -14,7 +13,6 @@ import click
 @click.option("--depth", "-d", type=int, help="Limit recursion depth")
 @click.option("--output", "-o", type=click.Path(), help="Save result to file")
 @click.option("--hidden", "-h", is_flag=True, help="Include hidden files/folders")
-@click.option("--ascii", "-a", is_flag=True, help="Use ASCII instead of Unicode box lines")
 @click.option(
     "--exclude",
     "-x",
@@ -22,7 +20,8 @@ import click
     help="Exclude patterns (folder names, file names, or extensions, e.g. __pycache__, *.txt, *.pyc)"
 )
 @click.option("--lang-help", "lang", help="Show localized help (pl, eng)")
-def cli(path, files, depth, output, hidden, ascii, exclude, lang):
+@click.option("--ascii", "-a", "use_ascii", is_flag=True, help="Use ASCII instead of Unicode box lines")
+def cli(path, files, depth, output, hidden, use_ascii, exclude, lang):
     """
     Print a visual tree of directories and (optionally) files.
 
@@ -64,7 +63,7 @@ def cli(path, files, depth, output, hidden, ascii, exclude, lang):
     exclude_patterns = list(default_excludes) + list(exclude)
 
     root = Path(path).resolve()
-    tree = _build_tree(root, files, depth, hidden, ascii, exclude_patterns)
+    tree = _build_tree(root, files, depth, hidden, use_ascii, exclude_patterns)
     if output:
         Path(output).write_text(tree, encoding="utf-8")
         click.echo(f"Saved to {output}")

@@ -9,53 +9,45 @@ import click
     help="Extract and filter JSON data with optional field selection."
 )
 @click.argument("file", required=False)
-@click.option("--path","-p", "path_expr", help="Dot-separated key path to list/obj, e.g. 'items' or 'root.nested.items'")
-@click.option("--filter","-fl", "filter_expr", help="Filter: key=value to match (string compare)")
-@click.option("--fields","-fld", help="Comma-separated list of fields to include in output")
-@click.option("--output","-o", "output_file", type=click.Path(), help="Save result to file")
-@click.option("--interactive","-i", is_flag=True, help="Pipe result through pager")
-@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing")
+@click.option("--path", "-p", "path_expr", help="Dot-separated key path to list/obj, e.g. 'items' or 'root.nested.items'")
+@click.option("--filter", "-fl", "filter_expr", help="Filter: key=value to match (string compare)")
+@click.option("--fields", "-fld", help="Comma-separated list of fields to include in output")
+@click.option("--output", "-o", "output_file", type=click.Path(), help="Save result to file")
+@click.option("--interactive", "-i", is_flag=True, help="Pipe result through pager")
+@click.option("--lang-help", "-lh", "lang", help="Show localized help (pl, eng) instead of executing")
 def cli(file, path_expr, filter_expr, fields, output_file, interactive, lang):
-    # ---------- lokalizowana pomoc ---------- #
     if lang:
         _print_help_md(lang)
         return
 
-    # ---------- walidacja ---------- #
     if not file:
         raise click.UsageError("Missing required argument 'file'")
 
-    # ---------- wczytaj JSON ---------- #
     file_path = Path(file)
     try:
         data = json.loads(file_path.read_text(encoding="utf-8"))
     except Exception as e:
-        raise click.ClickException(f"Failed to read/parse JSON: {e}")
+        raise click.ClickException(f"Failed to read/parse JSON: {e}") from e
 
-    # ---------- nawigacja po ścieżce ---------- #
     if path_expr:
         for key in path_expr.split("."):
             if key:
                 try:
                     data = data[key]
-                except Exception:
-                    raise click.ClickException(f"Key '{key}' not found in path '{path_expr}'")
+                except Exception as e:
+                    raise click.ClickException(f"Key '{key}' not found in path '{path_expr}'") from e
 
-    # ---------- zawsze operujemy na liście ---------- #
     if not isinstance(data, list):
         data = [data]
 
-    # ---------- filtrowanie ---------- #
     if filter_expr and "=" in filter_expr:
         key, value = filter_expr.split("=", 1)
         data = [entry for entry in data if str(entry.get(key)) == value]
 
-    # ---------- wybór pól ---------- #
     if fields:
         field_list = [f.strip() for f in fields.split(",")]
         data = [{k: v for k, v in entry.items() if k in field_list} for entry in data]
 
-    # ---------- wynik ---------- #
     output_text = "\n".join(json.dumps(d, ensure_ascii=False) for d in data)
 
     if output_file:

@@ -7,9 +7,6 @@ Works on Linux, macOS, and Windows. Requires `psutil` and `pyserial` for full se
 
 import importlib.resources
 import json as _json
-import os
-import platform
-import shutil
 import socket
 import subprocess
 import sys
@@ -20,11 +17,11 @@ import click
 @click.command(
     help="Show currently open TCP/UDP ports and serial ports (COM/LPT/tty) with process, PID, state, and device name."
 )
-@click.option("--proto","-pro", type=click.Choice(["tcp", "udp"]), help="Filter by protocol")
-@click.option("--port","-p", type=int, help="Filter by local port number")
-@click.option("--json","-j", "json_out", is_flag=True, help="Output raw JSON (TCP/UDP only)")
-@click.option("--serial","-s", is_flag=True, help="List physical serial/parallel ports (COM/LPT/tty) with device description")
-@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng)")
+@click.option("--proto", "-pro", type=click.Choice(["tcp", "udp"]), help="Filter by protocol")
+@click.option("--port", "-p", type=int, help="Filter by local port number")
+@click.option("--json", "-j", "json_out", is_flag=True, help="Output raw JSON (TCP/UDP only)")
+@click.option("--serial", "-s", is_flag=True, help="List physical serial/parallel ports (COM/LPT/tty) with device description")
+@click.option("--lang-help", "-lh", "lang", help="Show localized help (pl, eng)")
 def cli(proto, port, json_out, serial, lang):
     if lang:
         _print_help_md(lang)
@@ -72,11 +69,10 @@ def cli(proto, port, json_out, serial, lang):
             hdr = f"{'Proto':<4} {'PID':>6} {'Process':<18} {'Local':<22} {'Remote':<22} State"
             out_blocks.append(hdr)
             out_blocks.append("-" * len(hdr))
-            for e in result:
-                out_blocks.append(
-                    f"{e['proto']:<4} {str(e['pid']):>6} {e['process'][:17]:<18} "
-                    f"{e['local']:<22} {e['remote']:<22} {e['state']}"
-                )
+            out_blocks.extend(
+                f"{e['proto']:<4} {str(e['pid']):>6} {e['process'][:17]:<18} "
+                f"{e['local']:<22} {e['remote']:<22} {e['state']}"
+                for e in result)
 
     # --- SERIAL ports (COM, LPT, tty, cu), with descriptions ---
     if serial:
@@ -85,8 +81,7 @@ def cli(proto, port, json_out, serial, lang):
             out_blocks.append("No serial (COM/LPT/tty) ports found.")
         else:
             out_blocks.append("Available serial/parallel ports:")
-            for port in serial_ports:
-                out_blocks.append(f"  {port}")
+            out_blocks.extend(f"  {port}" for port in serial_ports)
 
     click.echo("\n".join(out_blocks))
 

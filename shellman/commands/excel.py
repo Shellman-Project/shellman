@@ -81,7 +81,7 @@ def info(file, lang):
     try:
         wb = load_workbook(filename=file_path, read_only=True, data_only=True)
     except Exception as e:
-        raise click.ClickException(f"Failed to read workbook: {e}")
+        raise click.ClickException(f"Failed to read workbook: {e}") from e
 
     click.echo(f"{'Sheet':<20} {'Rows':>7} {'Cols':>6}")
     click.echo("-" * 34)
@@ -150,8 +150,8 @@ def preview(file, sheet, rows, columns, output, interactive, info, lang):
 
     try:
         ws = wb.worksheets[int(sheet) - 1] if sheet.isdigit() else wb[sheet]
-    except Exception:
-        raise click.ClickException(f"Invalid sheet reference: {sheet}")
+    except Exception as e:
+        raise click.ClickException(f"Invalid sheet reference: {sheet}") from e
 
     # parse column letters like A,C-E
     def parse_spec(spec: str):
@@ -239,9 +239,9 @@ def preview(file, sheet, rows, columns, output, interactive, info, lang):
 # ======================  export  ========================================== #
 @cli.command("export", help="Export sheets or ranges of an Excel file to CSV.")
 @click.argument("file", required=False)
-@click.option("--sheets","-s", multiple=True, help="Sheet names or indexes")
-@click.option("--rows","-r", help="Row range start-end")
-@click.option("--columns","-c", help="Column letters (e.g. A,B-D)")
+@click.option("--sheets", "-s", multiple=True, help="Sheet names or indexes")
+@click.option("--rows", "-r", help="Row range start-end")
+@click.option("--columns", "-c", help="Column letters (e.g. A,B-D)")
 @click.option(
     "--out",
     "-o",
@@ -250,8 +250,8 @@ def preview(file, sheet, rows, columns, output, interactive, info, lang):
     default="csv",
     help="Output directory",
 )
-@click.option("--overwrite","-ow", is_flag=True, help="Overwrite CSVs without timestamp")
-@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng)")
+@click.option("--overwrite", "-ow", is_flag=True, help="Overwrite CSVs without timestamp")
+@click.option("--lang-help", "-lh", "lang", help="Show localized help (pl, eng)")
 def export(file, sheets, rows, columns, out_dir, overwrite, lang):
     """
     Export sheets or ranges from an Excel file to CSV files.
@@ -315,15 +315,15 @@ def export(file, sheets, rows, columns, out_dir, overwrite, lang):
     if rows:
         try:
             row_start, row_end = map(int, rows.split("-"))
-        except Exception:
-            raise click.ClickException("--rows must be in format start-end")
+        except Exception as e:
+            raise click.ClickException("--rows must be in format start-end") from e
 
     col_indices = None
     if columns:
         try:
             col_indices = parse_col_spec(columns)
-        except Exception:
-            raise click.ClickException("--columns must be like A,B-D")
+        except Exception as e:
+            raise click.ClickException("--columns must be like A,B-D") from e
 
     targets = wb.sheetnames if not sheets else list(sheets)
 
