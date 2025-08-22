@@ -9,12 +9,12 @@ from dateutil.relativedelta import relativedelta
 @click.command(
     help="Work with dates: add/subtract time, compare or format."
 )
-@click.option("--date","-d", "base_date", help="Base date (default: now)", default=None)
-@click.option("--add","-a", "add_input", help="Add duration (e.g. 5d, 3w, 2h, 10min)")
-@click.option("--sub","-s", "sub_input", help="Subtract duration")
-@click.option("--diff","-df", "diff_date", help="Date to compare to (diff mode)")
-@click.option("--format","-f", "format_pattern", help="Format output using strftime")
-@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
+@click.option("--date", "-d", "base_date", help="Base date (default: now)", default=None)
+@click.option("--add", "-a", "add_input", help="Add duration (e.g. 5d, 3w, 2h, 10min)")
+@click.option("--sub", "-s", "sub_input", help="Subtract duration")
+@click.option("--diff", "-df", "diff_date", help="Date to compare to (diff mode)")
+@click.option("--format", "-f", "format_pattern", help="Format output using strftime")
+@click.option("--lang-help", "-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
 def cli(base_date, add_input, sub_input, diff_date, format_pattern, lang):
     """
     Command-line tool for date and time calculations.
@@ -57,11 +57,11 @@ def cli(base_date, add_input, sub_input, diff_date, format_pattern, lang):
     if base_date:
         try:
             dt = datetime.strptime(base_date, "%Y-%m-%d %H:%M:%S")
-        except ValueError:
+        except ValueError as err1:
             try:
                 dt = datetime.strptime(base_date, "%Y-%m-%d")
-            except ValueError:
-                raise click.ClickException(f"Invalid base date: {base_date}")
+            except ValueError as err2:
+                raise click.ClickException(f"Invalid base date: {base_date}") from err2
     else:
         dt = datetime.now()
 
@@ -110,11 +110,12 @@ def cli(base_date, add_input, sub_input, diff_date, format_pattern, lang):
     if diff_date:
         try:
             other = datetime.strptime(diff_date, "%Y-%m-%d %H:%M:%S")
-        except ValueError:
+        except ValueError as err1:
             try:
                 other = datetime.strptime(diff_date, "%Y-%m-%d")
-            except ValueError:
-                raise click.ClickException(f"Invalid comparison date: {diff_date}")
+            except ValueError as err2:
+                raise click.ClickException(f"Invalid comparison date: {diff_date}") from err2
+
         delta = other - dt
         days = delta.days
         seconds = delta.seconds
