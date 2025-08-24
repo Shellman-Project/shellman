@@ -10,7 +10,7 @@
 ### 1 · Clone the repository
 
 ```bash
-git clone https://github.com/JakubMarciniak93/shellman
+git clone https://github.com/Shellman-Project/shellman.git
 cd shellman
 ```
 

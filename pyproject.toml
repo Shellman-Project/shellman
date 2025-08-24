@@ -6,15 +6,15 @@ authors = [{name = "Jakub Marciniak", email = "jakub.marciniak.app@gmail.com"}]
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-    "click",
-    "pyyaml",
-    "toml",
-    "cryptography",
-    "openpyxl",
-    "python-dateutil",
-    "chardet",
-    "pyserial",
-    "psutil",
+    "click==8.1.8",
+    "PyYAML==6.0.2",
+    "toml==0.10.2",
+    "cryptography==43.0.3",
+    "openpyxl==3.1.5",
+    "python-dateutil==2.9.0.post0",
+    "chardet==5.2.0",
+    "pyserial==3.5",
+    "psutil==7.0.0",
     "wmi; sys_platform == 'win32'",  # only install on Windows
 ]
 
