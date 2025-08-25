@@ -1,5 +1,4 @@
 import importlib.resources
-import os
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -20,13 +19,13 @@ def print_help_md(lang="eng"):
 @click.command(
     help="Delete files by name, extension, or age – with preview and confirmation."
 )
-@click.option("--path","-p", "scan_path", type=click.Path(exists=True, file_okay=False), default=".", help="Directory to scan")
-@click.option("--ext","-e", "ext_filter", help="Delete files with this extension")
-@click.option("--name","-n", "name_filter", help="Delete files whose name contains this pattern")
+@click.option("--path", "-p", "scan_path", type=click.Path(exists=True, file_okay=False), default=".", help="Directory to scan")
+@click.option("--ext", "-e", "ext_filter", help="Delete files with this extension")
+@click.option("--name", "-n", "name_filter", help="Delete files whose name contains this pattern")
 @click.option("--older-than", "-ot", "age_days", type=int, help="Delete only files older than N days")
-@click.option("--dry-run","-dr", is_flag=True, help="Preview: list files but do NOT delete")
-@click.option("--confirm","-c", is_flag=True, help="Ask Y/n before deleting each file")
-@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
+@click.option("--dry-run", "-dr", is_flag=True, help="Preview: list files but do NOT delete")
+@click.option("--confirm", "-c", is_flag=True, help="Ask Y/n before deleting each file")
+@click.option("--lang-help", "-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
 def cli(scan_path, ext_filter, name_filter, age_days, dry_run, confirm, lang):
     """
     Command-line interface for cleaning up files by extension, name, or age.

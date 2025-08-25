@@ -21,12 +21,12 @@ def print_help_md(lang="eng"):
     help="Find files by name, extension or content with filtering options."
 )
 @click.argument("search_path", required=False, type=click.Path(exists=True, file_okay=False))
-@click.option("--name","-n", "name_filter", help="Match filenames containing this fragment")
-@click.option("--content","-c", "content_filter", help="Search for files containing this text")
-@click.option("--ext","-e", "ext_filter", help="Only include files with this extension")
-@click.option("--output","-o", is_flag=True, help="Save results to logs/find_files_<timestamp>.log")
-@click.option("--show-size","-s", is_flag=True, help="Show file size next to each result")
-@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
+@click.option("--name", "-n", "name_filter", help="Match filenames containing this fragment")
+@click.option("--content", "-c", "content_filter", help="Search for files containing this text")
+@click.option("--ext", "-e", "ext_filter", help="Only include files with this extension")
+@click.option("--output", "-o", is_flag=True, help="Save results to logs/find_files_<timestamp>.log")
+@click.option("--show-size", "-s", is_flag=True, help="Show file size next to each result")
+@click.option("--lang-help", "-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
 def cli(search_path, name_filter, content_filter, ext_filter, output, show_size, lang):
     if lang:
         print_help_md(lang)
@@ -74,7 +74,6 @@ def cli(search_path, name_filter, content_filter, ext_filter, output, show_size,
             results.append(f"{file}  [{size_display}]")
         else:
             results.append(str(file))
-
 
     final_output = "\n".join(results)
     click.echo(final_output)

@@ -9,15 +9,15 @@ import click
     help="Extracts specific columns or rows from a CSV file with filtering options."
 )
 @click.argument("file", required=False)
-@click.option("--cols","-c", required=False, help="Columns to keep (1-based), e.g. 1,3 or 2-4")
-@click.option("--rows","-r", help="Rows to keep (after header), e.g. 2-10")
-@click.option("--contains","-con", help="Only keep rows containing this text")
-@click.option("--not-contains","-ncon", "not_contains", help="Only keep rows NOT containing this text")
-@click.option("--delim","-d", default=",", help="CSV delimiter (default: ,)")
-@click.option("--skip-header","-sh", is_flag=True, default=False, help="Skip first line (header)")
-@click.option("--output","-o", type=click.Path(), help="Save result instead of printing")
-@click.option("--interactive","-i", is_flag=True, default=False, help="Pipe result to less")
-@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
+@click.option("--cols", "-c", required=False, help="Columns to keep (1-based), e.g. 1,3 or 2-4")
+@click.option("--rows", "-r", help="Rows to keep (after header), e.g. 2-10")
+@click.option("--contains", "-con", help="Only keep rows containing this text")
+@click.option("--not-contains", "-ncon", "not_contains", help="Only keep rows NOT containing this text")
+@click.option("--delim", "-d", default=",", help="CSV delimiter (default: ,)")
+@click.option("--skip-header", "-sh", is_flag=True, default=False, help="Skip first line (header)")
+@click.option("--output", "-o", type=click.Path(), help="Save result instead of printing")
+@click.option("--interactive", "-i", is_flag=True, default=False, help="Pipe result to less")
+@click.option("--lang-help", "-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
 def cli(file, cols, rows, contains, not_contains, delim, skip_header, output, interactive, lang):
     """
     Extract specific columns or rows from a CSV file with optional filtering.

@@ -12,20 +12,18 @@ import yaml
     help="Convert between JSON, YAML and TOML formats."
 )
 @click.argument("file", required=False)
-@click.option("--from","-f", "from_format",
+@click.option("--from", "-f", "from_format",
               required=False,
               type=click.Choice(["json", "yaml", "toml"]),
               help="Input format (required unless using --lang-help)")
-
-@click.option("--to","-t", "to_format",
+@click.option("--to", "-t", "to_format",
               required=False,
               type=click.Choice(["json", "yaml", "toml"]),
               help="Output format (required unless using --lang-help)")
-
-@click.option("--output","-o", "output_file", type=click.Path(), help="Save to file instead of stdout")
-@click.option("--pretty","-p", is_flag=True, help="Pretty-print output (where supported)")
-@click.option("--interactive","-i", is_flag=True, help="Pipe output to less (if no --output)")
-@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing")
+@click.option("--output", "-o", "output_file", type=click.Path(), help="Save to file instead of stdout")
+@click.option("--pretty", "-p", is_flag=True, help="Pretty-print output (where supported)")
+@click.option("--interactive", "-i", is_flag=True, help="Pipe output to less (if no --output)")
+@click.option("--lang-help", "-lh", "lang", help="Show localized help (pl, eng) instead of executing")
 def cli(file, from_format, to_format, output_file, pretty, interactive, lang):
     """
     Command-line interface for converting between JSON, YAML, and TOML formats.
@@ -48,7 +46,7 @@ def cli(file, from_format, to_format, output_file, pretty, interactive, lang):
             the conversion.
 
     Raises:
-        click.UsageError: If required arguments `file`, `from_format`, or 
+        click.UsageError: If required arguments `file`, `from_format`, or
             `to_format` are missing (unless using `--lang-help`).
         click.ClickException: If an unsupported format is specified or if
             file parsing fails.

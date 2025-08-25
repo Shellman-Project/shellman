@@ -9,17 +9,19 @@ import click
 
 
 def _is_git_bash():
-    return (os.name == "nt" and (
-        "MSYSTEM" in os.environ or
-        "GIT_INSTALL_ROOT" in os.environ or
-        "git" in (os.environ.get("SHELL") or "") or
-        (shutil.which("bash") and "usr/bin/bash" in shutil.which("bash").replace("\\", "/"))
-    ))
+    return (
+        os.name == "nt"
+        and (
+            "MSYSTEM" in os.environ
+            or "GIT_INSTALL_ROOT" in os.environ
+            or "git" in (os.environ.get("SHELL") or "")
+            or (shutil.which("bash") and "usr/bin/bash" in shutil.which("bash").replace("\\", "/"))
+        )
+    )
 
-@click.command(
-    help="Show system, shell and tool environment summary."
-)
-@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing")
+
+@click.command(help="Show system, shell and tool environment summary.")
+@click.option("--lang-help", "-lh", "lang", help="Show localized help (pl, eng) instead of executing")
 def cli(lang):
     if lang:
         _print_help_md(lang)
@@ -36,7 +38,9 @@ def cli(lang):
 
     # --- GIT BASH info tip ---
     if _is_git_bash():
-        print("💡 TIP: For full hardware info (Bluetooth, serial no., etc), run sys_summary in Windows PowerShell or CMD — not in Git Bash.")
+        print(
+            "💡 TIP: For full hardware info (Bluetooth, serial no., etc), run sys_summary in Windows PowerShell or CMD — not in Git Bash."
+        )
         print()
 
     # ----------- System Info ----------- #
@@ -47,8 +51,14 @@ def cli(lang):
         try:
             with open("/etc/os-release") as f:
                 lines = f.read().splitlines()
-                name = next((l.split("=")[1].strip('"') for l in lines if l.startswith("NAME=")), "")
-                version = next((l.split("=")[1].strip('"') for l in lines if l.startswith("VERSION_ID=")), "")
+                name = next(
+                    (line.split("=")[1].strip('"') for line in lines if line.startswith("NAME=")),
+                    "",
+                )
+                version = next(
+                    (line.split("=")[1].strip('"') for line in lines if line.startswith("VERSION_ID=")),
+                    "",
+                )
                 distro = f"{name} {version}"
                 print(f"Distro       : {distro}")
         except Exception:
@@ -79,10 +89,24 @@ def cli(lang):
         if os_name == "Windows":
             try:
                 if shutil.which("wmic"):
-                    out = subprocess.run(["wmic", "bios", "get", "serialnumber"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+                    out = subprocess.run(
+                        ["wmic", "bios", "get", "serialnumber"],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.DEVNULL,
+                        text=True,
+                    )
                 else:
-                    out = subprocess.run(["cmd.exe", "/c", "wmic bios get serialnumber"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
-                lines = [l.strip() for l in out.stdout.splitlines() if l.strip() and "SerialNumber" not in l]
+                    out = subprocess.run(
+                        ["cmd.exe", "/c", "wmic bios get serialnumber"],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.DEVNULL,
+                        text=True,
+                    )
+                lines = [
+                    line.strip()
+                    for line in out.stdout.splitlines()
+                    if line.strip() and "SerialNumber" not in line
+                ]
                 serial_number = lines[0] if lines else None
             except Exception:
                 serial_number = None
@@ -91,7 +115,12 @@ def cli(lang):
                 with open("/sys/class/dmi/id/product_serial") as f:
                     serial_number = f.read().strip()
             elif shutil.which("dmidecode"):
-                out = subprocess.run(["sudo", "dmidecode", "-s", "system-serial-number"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+                out = subprocess.run(
+                    ["sudo", "dmidecode", "-s", "system-serial-number"],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.DEVNULL,
+                    text=True,
+                )
                 serial_number = out.stdout.strip().splitlines()[0]
         elif os_name == "Darwin":
             out = subprocess.run(["system_profiler", "SPHardwareDataType"], stdout=subprocess.PIPE, text=True)
@@ -108,6 +137,7 @@ def cli(lang):
     print("─" * 40)
     try:
         import psutil
+
         cpu_count = psutil.cpu_count(logical=False)
         cpu_count_logical = psutil.cpu_count(logical=True)
         cpu_freq = psutil.cpu_freq().current if psutil.cpu_freq() else None
@@ -139,6 +169,7 @@ def cli(lang):
     found_sensor = False
     try:
         import psutil
+
         if hasattr(psutil, "sensors_temperatures"):
             temps = psutil.sensors_temperatures()
             if temps:
@@ -159,19 +190,29 @@ def cli(lang):
     try:
         if os_name == "Linux":
             out = subprocess.run(["lspci"], stdout=subprocess.PIPE, text=True)
-            for line in out.stdout.splitlines():
-                if "VGA compatible controller" in line or "3D controller" in line:
-                    gpus.append(line.split(":")[-1].strip())
+            gpus.extend(
+                line.split(":")[-1].strip()
+                for line in out.stdout.splitlines()
+                if "VGA compatible controller" in line or "3D controller" in line
+            )
         elif os_name == "Windows":
             try:
                 import wmi
+
                 w = wmi.WMI()
-                for gpu in w.Win32_VideoController():
-                    gpus.append(gpu.Name)
+                gpus.extend(gpu.Name for gpu in w.Win32_VideoController())
             except ImportError:
                 try:
-                    out = subprocess.run(["wmic", "path", "win32_VideoController", "get", "name"], stdout=subprocess.PIPE, text=True)
-                    gpus += [l.strip() for l in out.stdout.splitlines()[1:] if l.strip()]
+                    out = subprocess.run(
+                        ["wmic", "path", "win32_VideoController", "get", "name"],
+                        stdout=subprocess.PIPE,
+                        text=True,
+                    )
+                    gpus += [
+                        line.strip()
+                        for line in out.stdout.splitlines()[1:]
+                        if line.strip()
+                    ]
                 except Exception:
                     pass
         elif os_name == "Darwin":
@@ -193,13 +234,19 @@ def cli(lang):
     print("─" * 40)
     try:
         import psutil
+
         if hasattr(psutil, "sensors_battery"):
             battery = psutil.sensors_battery()
             if battery is not None:
                 print(f"Percent      : {battery.percent}%")
                 print(f"Plugged in   : {'Yes' if battery.power_plugged else 'No'}")
-                if hasattr(battery, "secsleft") and battery.secsleft != psutil.POWER_TIME_UNLIMITED and battery.secsleft != psutil.POWER_TIME_UNKNOWN:
+                if (
+                    hasattr(battery, "secsleft")
+                    and battery.secsleft != psutil.POWER_TIME_UNLIMITED
+                    and battery.secsleft != psutil.POWER_TIME_UNKNOWN
+                ):
                     import datetime
+
                     t = str(datetime.timedelta(seconds=battery.secsleft))
                     print(f"Time left    : {t}")
             else:
@@ -216,7 +263,7 @@ def cli(lang):
     found_bt = False
     try:
         if os_name == "Linux":
-            out = subprocess.run(['bluetoothctl', 'show'], stdout=subprocess.PIPE, text=True)
+            out = subprocess.run(["bluetoothctl", "show"], stdout=subprocess.PIPE, text=True)
             for line in out.stdout.splitlines():
                 if "Powered" in line:
                     print(f"{line.strip()}")
@@ -224,18 +271,34 @@ def cli(lang):
         elif os_name == "Windows":
             try:
                 if shutil.which("powershell"):
-                    out = subprocess.run(['powershell', '-Command', 'Get-PnpDevice -Class Bluetooth'], stdout=subprocess.PIPE, text=True)
+                    out = subprocess.run(
+                        ["powershell", "-Command", "Get-PnpDevice -Class Bluetooth"],
+                        stdout=subprocess.PIPE,
+                        text=True,
+                    )
                 else:
-                    out = subprocess.run(["cmd.exe", "/c", "powershell -Command \"Get-PnpDevice -Class Bluetooth\""], stdout=subprocess.PIPE, text=True)
-                bt_devices = [l for l in out.stdout.splitlines() if l and not l.startswith("Status")]
+                    out = subprocess.run(
+                        ["cmd.exe", "/c", 'powershell -Command "Get-PnpDevice -Class Bluetooth"'],
+                        stdout=subprocess.PIPE,
+                        text=True,
+                    )
+                bt_devices = [
+                    line
+                    for line in out.stdout.splitlines()
+                    if line and not line.startswith("Status")
+                ]
                 for line in bt_devices:
                     print(line)
                     found_bt = True
             except Exception:
                 print("Bluetooth info unavailable")
         elif os_name == "Darwin":
-            out = subprocess.run(['system_profiler', 'SPBluetoothDataType'], stdout=subprocess.PIPE, text=True)
-            lines = [l for l in out.stdout.splitlines() if "Bluetooth" in l or "Connected" in l or "Manufacturer" in l]
+            out = subprocess.run(["system_profiler", "SPBluetoothDataType"], stdout=subprocess.PIPE, text=True)
+            lines = [
+                line
+                for line in out.stdout.splitlines()
+                if "Bluetooth" in line or "Connected" in line or "Manufacturer" in line
+            ]
             for line in lines:
                 print(line)
                 found_bt = True
@@ -264,7 +327,9 @@ def cli(lang):
     elif os_name == "Darwin":
         try:
             mem = subprocess.run(["vm_stat"], stdout=subprocess.PIPE, text=True).stdout
-            total = int(subprocess.run(["sysctl", "-n", "hw.memsize"], stdout=subprocess.PIPE, text=True).stdout) // (1024 * 1024)
+            total = int(
+                subprocess.run(["sysctl", "-n", "hw.memsize"], stdout=subprocess.PIPE, text=True).stdout
+            ) // (1024 * 1024)
             print(f"Total memory: {total} MB")
             print(mem.strip())
         except Exception:
@@ -272,10 +337,11 @@ def cli(lang):
     elif os_name == "Windows":
         try:
             import psutil
+
             vm = psutil.virtual_memory()
-            print(f"Total      : {vm.total // (1024*1024)} MB")
-            print(f"Available  : {vm.available // (1024*1024)} MB")
-            print(f"Used       : {vm.used // (1024*1024)} MB")
+            print(f"Total      : {vm.total // (1024 * 1024)} MB")
+            print(f"Available  : {vm.available // (1024 * 1024)} MB")
+            print(f"Used       : {vm.used // (1024 * 1024)} MB")
             print(f"Percent    : {vm.percent}%")
         except Exception:
             print("psutil not available")
@@ -295,9 +361,11 @@ def cli(lang):
             print("uptime command not available")
     elif os_name == "Windows":
         try:
-            import psutil
-            boot = psutil.boot_time()
             import datetime
+
+            import psutil
+
+            boot = psutil.boot_time()
             uptime = datetime.datetime.now() - datetime.datetime.fromtimestamp(boot)
             print(f"Uptime       : {str(uptime).split('.')[0]}")
             print("Load Avg.    : (not available on Windows)")
@@ -323,9 +391,13 @@ def cli(lang):
     elif os_name == "Windows":
         try:
             import psutil
+
             for part in psutil.disk_partitions():
                 usage = psutil.disk_usage(part.mountpoint)
-                print(f"{part.device} - {usage.percent}% used ({usage.used // (1024*1024)} MB of {usage.total // (1024*1024)} MB)")
+                print(
+                    f"{part.device} - {usage.percent}% used "
+                    f"({usage.used // (1024 * 1024)} MB of {usage.total // (1024 * 1024)} MB)"
+                )
         except Exception:
             print("psutil not available")
     print()
@@ -336,7 +408,11 @@ def cli(lang):
     ip_local = ip_public = "unavailable"
     if os_name in ["Linux", "Darwin"]:
         try:
-            ip_local = subprocess.run(["hostname", "-I"], stdout=subprocess.PIPE, text=True).stdout.strip().split()[0]
+            ip_local = (
+                subprocess.run(["hostname", "-I"], stdout=subprocess.PIPE, text=True)
+                .stdout.strip()
+                .split()[0]
+            )
         except Exception:
             pass
     elif os_name == "Windows":
@@ -346,6 +422,7 @@ def cli(lang):
             pass
     try:
         import urllib.request
+
         ip_public = urllib.request.urlopen("https://ifconfig.me").read().decode().strip()
     except Exception:
         pass
@@ -355,11 +432,13 @@ def cli(lang):
     # ----------- Packages ----------- #
     print("\U0001f4e6  Packages")
     print("─" * 40)
+
     def detect_pkg_mgr():
         for cmd in ["apt", "dnf", "pacman", "brew", "choco"]:
             if shutil.which(cmd):
                 return cmd
         return "none"
+
     pkg_mgr = detect_pkg_mgr()
     count = "unknown"
     try:
@@ -384,13 +463,13 @@ def cli(lang):
     printers = []
     try:
         if os_name == "Windows":
-            out = subprocess.run(['wmic', 'printer', 'get', 'name'], stdout=subprocess.PIPE, text=True)
-            printers = [l.strip() for l in out.stdout.splitlines()[1:] if l.strip()]
+            out = subprocess.run(["wmic", "printer", "get", "name"], stdout=subprocess.PIPE, text=True)
+            printers = [line.strip() for line in out.stdout.splitlines()[1:] if line.strip()]
         elif os_name == "Linux":
-            out = subprocess.run(['lpstat', '-p'], stdout=subprocess.PIPE, text=True)
+            out = subprocess.run(["lpstat", "-p"], stdout=subprocess.PIPE, text=True)
             printers = [line.split()[1] for line in out.stdout.splitlines() if line.startswith("printer ")]
         elif os_name == "Darwin":
-            out = subprocess.run(['lpstat', '-p'], stdout=subprocess.PIPE, text=True)
+            out = subprocess.run(["lpstat", "-p"], stdout=subprocess.PIPE, text=True)
             printers = [line.split()[1] for line in out.stdout.splitlines() if line.startswith("printer ")]
     except Exception:
         pass
@@ -407,19 +486,23 @@ def cli(lang):
     try:
         ssid = None
         if os_name == "Windows":
-            out = subprocess.run(['netsh', 'wlan', 'show', 'interfaces'], stdout=subprocess.PIPE, text=True)
+            out = subprocess.run(["netsh", "wlan", "show", "interfaces"], stdout=subprocess.PIPE, text=True)
             for line in out.stdout.splitlines():
                 if "SSID" in line and "BSSID" not in line:
                     ssid = line.split(":")[-1].strip()
                     break
         elif os_name == "Darwin":
-            out = subprocess.run(['/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport', '-I'], stdout=subprocess.PIPE, text=True)
+            out = subprocess.run(
+                ["/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport", "-I"],
+                stdout=subprocess.PIPE,
+                text=True,
+            )
             for line in out.stdout.splitlines():
                 if " SSID" in line:
                     ssid = line.split(":")[-1].strip()
                     break
         elif os_name == "Linux":
-            out = subprocess.run(['iwgetid', '-r'], stdout=subprocess.PIPE, text=True)
+            out = subprocess.run(["iwgetid", "-r"], stdout=subprocess.PIPE, text=True)
             ssid = out.stdout.strip() if out.returncode == 0 else None
         print(f"Connected SSID: {ssid or 'unavailable'}")
     except Exception:
@@ -432,6 +515,7 @@ def cli(lang):
     try:
         if os_name == "Windows":
             import ctypes
+
             user32 = ctypes.windll.user32
             screens = user32.GetSystemMetrics(80)
             width = user32.GetSystemMetrics(0)
@@ -439,13 +523,13 @@ def cli(lang):
             print(f"Main display: {width} x {height}")
             print(f"Number of screens: {screens or 1}")
         elif os_name == "Darwin":
-            out = subprocess.run(['system_profiler', 'SPDisplaysDataType'], stdout=subprocess.PIPE, text=True)
+            out = subprocess.run(["system_profiler", "SPDisplaysDataType"], stdout=subprocess.PIPE, text=True)
             for line in out.stdout.splitlines():
                 if "Resolution:" in line:
                     print(" ".join(line.split()))
         elif os_name == "Linux":
             try:
-                out = subprocess.run(['xrandr'], stdout=subprocess.PIPE, text=True)
+                out = subprocess.run(["xrandr"], stdout=subprocess.PIPE, text=True)
                 for line in out.stdout.splitlines():
                     if " connected " in line:
                         print(line)
@@ -454,6 +538,7 @@ def cli(lang):
     except Exception:
         print("Display info unavailable")
     print()
+
 
 def _print_help_md(lang: str = "eng"):
     lang_file = f"help_{lang.lower()}.md"

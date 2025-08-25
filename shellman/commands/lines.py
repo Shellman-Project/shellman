@@ -11,21 +11,21 @@ import click
     help="Extract, count or summarize lines in files or folders with powerful filters and context options."
 )
 @click.argument("inputs", nargs=-1, type=click.Path(exists=True))
-@click.option("--extract","-e", is_flag=True, help="Print out matching lines (default mode)")
+@click.option("--extract", "-e", is_flag=True, help="Print out matching lines (default mode)")
 @click.option("--count", is_flag=True, help="Show only count of matching lines")
-@click.option("--summary","-s", is_flag=True, help="Print summary (files, total lines, matches)")
-@click.option("--contains","-c", help="Keep lines containing this text")
-@click.option("--not-contains","-nc", help="Keep lines NOT containing this text")
-@click.option("--regex","-r", help="Count or extract lines matching regex")
-@click.option("--ignore-case","-ic", is_flag=True, help="Case-insensitive matching")
-@click.option("--before","-b", type=int, default=0, help="Show N lines before each match")
-@click.option("--after","-a", type=int, default=0, help="Show N lines after each match")
+@click.option("--summary", "-s", is_flag=True, help="Print summary (files, total lines, matches)")
+@click.option("--contains", "-c", help="Keep lines containing this text")
+@click.option("--not-contains", "-nc", help="Keep lines NOT containing this text")
+@click.option("--regex", "-r", help="Count or extract lines matching regex")
+@click.option("--ignore-case", "-ic", is_flag=True, help="Case-insensitive matching")
+@click.option("--before", "-b", type=int, default=0, help="Show N lines before each match")
+@click.option("--after", "-a", type=int, default=0, help="Show N lines after each match")
 @click.option("--ext", help="Only include files with this extension")
-@click.option("--percent","-p", is_flag=True, help="Show percentage of matches")
-@click.option("--output","-o", type=click.Path(), help="Save result to file")
-@click.option("--interactive","-i", is_flag=True, help="View results in pager")
-@click.option("--show-size","-ss", is_flag=True, help="Show file size in output")
-@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing")
+@click.option("--percent", "-p", is_flag=True, help="Show percentage of matches")
+@click.option("--output", "-o", type=click.Path(), help="Save result to file")
+@click.option("--interactive", "-i", is_flag=True, help="View results in pager")
+@click.option("--show-size", "-ss", is_flag=True, help="Show file size in output")
+@click.option("--lang-help", "-lh", "lang", help="Show localized help (pl, eng) instead of executing")
 def cli(
     inputs,
     extract,
@@ -69,9 +69,10 @@ def cli(
                 continue
             files.append(path)
         elif path.is_dir():
-            for file in path.rglob("*"):
-                if file.is_file() and (not ext or file.name.endswith(f".{ext}")):
-                    files.append(file)
+            files.extend(
+                file
+                for file in path.rglob("*")
+                if file.is_file() and (not ext or file.name.endswith(f".{ext}")))
         else:
             click.echo(f"Invalid path: {input_path}", err=True)
 
@@ -124,8 +125,9 @@ def cli(
                 else:
                     ranges.append((start, end))
             for r_start, r_end in ranges:
-                for i in range(r_start, r_end + 1):
-                    output_lines.append(f"{i + 1}:{lines[i].rstrip()}")
+                output_lines.extend(
+                    f"{i + 1}:{lines[i].rstrip()}"
+                    for i in range(r_start, r_end + 1))
                 output_lines.append("-" * 20)
             if output_lines and output_lines[-1] == "-" * 20:
                 output_lines.pop()

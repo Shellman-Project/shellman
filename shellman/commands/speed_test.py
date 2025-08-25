@@ -8,7 +8,6 @@ import json as _json
 import shutil
 import subprocess
 import sys
-from pathlib import Path
 
 import click
 
@@ -16,13 +15,13 @@ import click
 @click.command(
     help="Run a quick internet speed test (download, upload, ping)."
 )
-@click.option("--json","-j", "json_out", is_flag=True, help="Output raw JSON result")
+@click.option("--json", "-j", "json_out", is_flag=True, help="Output raw JSON result")
 @click.option(
-    "--only","-o","only",
+    "--only", "-o", "only",
     type=click.Choice(["download", "upload", "ping"]),
     help="Show only a single metric",
 )
-@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng)")
+@click.option("--lang-help", "-lh", "lang", help="Show localized help (pl, eng)")
 def cli(json_out, only, lang):
     if lang:
         _print_help_md(lang)

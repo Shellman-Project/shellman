@@ -25,12 +25,12 @@ def print_help_md(lang="eng"):
 @click.command(
     help="Generate or verify checksums (SHA256, MD5, etc.) for files."
 )
-@click.option("--path","-p", "scan_path", type=click.Path(exists=True, file_okay=False), default=".", help="Directory to scan")
-@click.option("--ext","-e", "ext_filter", help="Only include files with this extension")
-@click.option("--algo","-a", type=click.Choice(["sha256", "md5", "sha1"]), default="sha256", help="Hash algorithm")
-@click.option("--out","-o", "out_file", type=click.Path(), help="Output list file name")
-@click.option("--verify","-v", is_flag=True, help="Verify instead of generate (reads --out list)")
-@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
+@click.option("--path", "-p", "scan_path", type=click.Path(exists=True, file_okay=False), default=".", help="Directory to scan")
+@click.option("--ext", "-e", "ext_filter", help="Only include files with this extension")
+@click.option("--algo", "-a", type=click.Choice(["sha256", "md5", "sha1"]), default="sha256", help="Hash algorithm")
+@click.option("--out", "-o", "out_file", type=click.Path(), help="Output list file name")
+@click.option("--verify", "-v", is_flag=True, help="Verify instead of generate (reads --out list)")
+@click.option("--lang-help", "-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
 def cli(scan_path, ext_filter, algo, out_file, verify, lang):
     """
     Command-line interface for generating or verifying file checksums.
