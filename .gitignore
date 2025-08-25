@@ -5,7 +5,6 @@ tmp/
 .DS_Store
 *.swp
 *.bak
-*.txt
 shellman/shellman.egg-info/PKG-INFO
 shellman.egg-info/PKG-INFO
 shellman/cli.py

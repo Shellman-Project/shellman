@@ -10,11 +10,11 @@
 ### 1 · Clone the repository
 
 ```bash
-git clone https://github.com/JakubMarciniak93/shellman
+git clone https://github.com/Shellman-Project/shellman.git
 cd shellman
 ```
 
-### 2 · Install dependencies
+### 2 · Installation
 
 A virtual-env is recommended:
 
@@ -23,6 +23,7 @@ python -m venv .venv
 source .venv/bin/activate      # Linux / macOS
 .venv\Scripts\activate         # Windows
 pip install -r requirements.txt
+pip install .
 ```
 
 Using Poetry instead?
