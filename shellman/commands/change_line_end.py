@@ -1,5 +1,4 @@
 import importlib.resources
-import os
 from pathlib import Path
 
 import click
@@ -24,26 +23,26 @@ def print_help_md(lang="eng"):
 @click.option("--ext", "-x", help="Only process files with this extension (requires --dir)")
 @click.option("--to", "-t", "target", type=click.Choice(["lf", "crlf"]), help="Convert to specified line endings")
 @click.option("--check", "-c", "check_mode", is_flag=True, help="Only check and report line ending type per file")
-@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
+@click.option("--lang-help", "-lh", "lang", help="Show localized help (pl, eng) instead of executing the command")
 def cli(file_path, dir_path, ext, target, check_mode, lang):
     """
     Command-line interface for converting or checking line endings (LF/CRLF).
 
-    Supports scanning a single file or recursively processing a directory. 
-    Can either convert line endings to the specified style or check/report 
+    Supports scanning a single file or recursively processing a directory.
+    Can either convert line endings to the specified style or check/report
     the current type per file.
 
     Args:
         file_path (str | None): Path to a single file (exclusive with `dir_path`).
         dir_path (str | None): Path to a directory (recursive search).
         ext (str | None): Only process files with this extension (requires `--dir`).
-        target (str | None): Desired line endings ("lf" or "crlf"). 
+        target (str | None): Desired line endings ("lf" or "crlf").
             Required unless `check_mode` is used.
         check_mode (bool): If True, only report detected line endings per file.
         lang (str | None): Print localized help ("pl", "eng") instead of executing.
 
     Raises:
-        click.UsageError: If neither `--to` nor `--check` is provided, 
+        click.UsageError: If neither `--to` nor `--check` is provided,
             or if neither `--file` nor `--dir` is specified.
 
     Examples:
@@ -117,7 +116,7 @@ def convert_endings(path: Path, to: str):
     """
     Convert the line endings of a file to LF or CRLF.
 
-    Reads the file in binary mode, normalizes its line endings, and writes 
+    Reads the file in binary mode, normalizes its line endings, and writes
     the converted result back to the same file.
 
     Args:
