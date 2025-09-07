@@ -12,7 +12,8 @@ import click
 @click.option("--files", "-f", is_flag=True, help="Include files, not just folders")
 @click.option("--depth", "-d", type=int, help="Limit recursion depth")
 @click.option("--output", "-o", type=click.Path(), help="Save result to file")
-@click.option("--hidden", "-h", is_flag=True, help="Include hidden files/folders")
+@click.option("--hidden", "-hd", is_flag=True, help="Include hidden files/folders")
+@click.option("--ascii", "-a", is_flag=True, help="Use ASCII instead of Unicode box lines")
 @click.option(
     "--exclude",
     "-x",
