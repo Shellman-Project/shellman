@@ -1,5 +1,4 @@
 import importlib.resources
-import os
 import subprocess
 from datetime import datetime
 from pathlib import Path
@@ -10,21 +9,19 @@ import click
 @click.command(
     help="Create zip archives from folders or files in batch."
 )
-@click.option("--path","-p", "src_path",
+@click.option("--path", "-p", "src_path",
               type=click.Path(exists=True, file_okay=False),
               default=".",
               help="Source directory to scan (default: current dir)")
-
-@click.option("--ext","-e", help="Only include files with this extension")
-@click.option("--per-folder","-pf", is_flag=True, help="Create one archive per immediate sub-folder")
-@click.option("--output","-o", "out_dir",
+@click.option("--ext", "-e", help="Only include files with this extension")
+@click.option("--per-folder", "-pf", is_flag=True, help="Create one archive per immediate sub-folder")
+@click.option("--output", "-o", "out_dir",
               type=click.Path(),
               default="./zips",
               help="Output directory (default: ./zips)")
-
-@click.option("--name","-n", "name_prefix", default="batch_", help="Prefix for archive name")
-@click.option("--password","-pass", help="Password for zip (uses `zip -P` – weak encryption!)")
-@click.option("--lang-help","-lh", "lang", help="Show localized help (pl, eng) instead of executing")
+@click.option("--name", "-n", "name_prefix", default="batch_", help="Prefix for archive name")
+@click.option("--password", "-pass", help="Password for zip (uses `zip -P` – weak encryption!)")
+@click.option("--lang-help", "-lh", "lang", help="Show localized help (pl, eng) instead of executing")
 def cli(src_path, ext, per_folder, out_dir, name_prefix, password, lang):
     if lang:
         _print_help_md(lang)
