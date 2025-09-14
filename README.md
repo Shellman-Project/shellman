@@ -82,9 +82,7 @@ command	short description:
 
 | Command| Purpose| Quick example|
 |-----------------|--------------------------------------|---------------------------------------------|
-| excel_info      | Show sheet list with rows/cols count | `shellman excel_info report.xlsx`           |
-| excel_preview   | Quick preview of Excel sheet contents| `shellman excel_preview report.xlsx`        |
-| excel_to_csv    | Export Excel sheet/range to CSV      | `shellman excel_to_csv report.xlsx out.csv` |
+| excel | Excel utilities: info / preview / export | shellman excel info data.xlsx |
 | find_files      | Locate files by name, content or extension  | `shellman find_files ./src --name util` |
 | change_line_end | LF ↔ CRLF conversion / check                | `shellman change_line_end file.txt`     |
 | checksum_files  | Create or verify checksums (sha256, md5, sha1)   | `shellman checksum_files ./downloads`   |
@@ -727,185 +725,137 @@ Each file is encrypted separately, with a unique salt and IV.
 
 This is not a replacement for full-disk encryption or secure file storage!
 ---
-# Command - excel info
 
-Show all sheets in an Excel file with row and column count.
+# Command – excel (group)
 
----
+Utilities for working with Excel files: quick structure checks, table previews, and CSV export.
 
-## 📝 Description
+## Subcommands:
 
-Lists every sheet in a given `.xlsx` file, showing:
-- Sheet name
-- Number of rows
-- Number of columns
+- excel info – list sheets with row/column counts 
+- excel preview – preview the first N rows / selected columns
+- excel export – export sheets or ranges to CSV
 
-Useful for quick inspection of Excel structure.
-
----
-
-## Usage
-
+Quick examples:
 ```sh
-shellman excel info FILE.xlsx
+shellman excel info report.xlsx
+shellman excel preview data.xlsx --sheet 2 --rows 10 --columns A,C-E -i
+shellman excel export workbook.xlsx -s 1 -s 3 -o out --overwrite
 ```
-## Example
+
+## excel info
+
+List all sheets in an .xlsx file with the number of rows and columns.
+### Usage
 ```sh
-shellman excel info data.xlsx
+shellman excel info FILE.xlsx [--lang-help pl|eng]
 ```
-Output:
+
+Example output:
 
 ```sh
 Sheet                 Rows   Cols
 ----------------------------------
 Sheet1                 125      8
-Summary                12      4
+Summary                 12      4
 ```
-⚠️ Notes
-FILE must be a valid Excel file (.xlsx).
 
-Works in read-only mode (safe for large files).
----
-# Command - excel preview
-
-Preview the first N rows or selected columns of a chosen Excel sheet.
-
----
-
-## 📝 Description
-
-Displays a preview of data from an Excel sheet:
-- Choose sheet by index or name (default: first)
-- Select columns (e.g., `A,C-E`)
-- Limit number of rows shown
-- Show row numbers, headers, and custom separators
-- Output as table or raw CSV
-
-Optionally, save the preview to a file or view interactively (paged).
-
----
-
-## Usage
-
+Options:
 ```sh
-shellman excel preview FILE.xlsx [--sheet NAME/NUM] [--rows N] [--columns SPEC] [OPTIONS]
+--lang-help pl|eng — show localized help text instead of executing
 ```
+
+## excel preview
+
+Preview the first N rows of a sheet (by index or name) with optional column selection.
+Can render as a neatly aligned table (row numbers, | separators) or raw CSV.
+Supports saving to a file or paging interactively.
+
+### Usage
+```sh
+shellman excel preview FILE.xlsx \
+  [--sheet NAME_OR_NUM] [--rows N] [--columns SPEC] \
+  [--output FILE] [--interactive] [--info|-i] [--lang-help pl|eng]
+```
+
 Options
 ```sh
---sheet
-```
-Sheet name or number (default: 1st sheet)
-```sh
---rows
-```
-Number of rows to preview (default: 20)
-```sh
---columns
-```
-Columns, e.g. A,C-E
-```sh
---output
-```
-Save preview to file
-```sh
---interactive
-```
-Pipe result to pager (e.g., less)
-```sh
---info, -i
-```
-Show column headers, row numbers, | separator
-## Examples
-Preview columns A and C-E from the 2nd sheet, show first 10 rows:
+--sheet TEXT — sheet name or 1-based index (default: 1)
 
+--rows INT — number of rows to preview (default: 20)
+
+--columns TEXT — column spec like A,C-E
+
+--output PATH — save result to a file (text)
+
+--interactive — pipe to pager (less -S)
+
+--info, -i — show column headers, row numbers, and | separator
+
+--lang-help pl|eng — localized help
+```
+Examples:
 ```sh
+# 10 rows from sheet #2, columns A and C–E, pretty table:
 shellman excel preview data.xlsx --sheet 2 --rows 10 --columns A,C-E -i
 ```
-Save first 50 rows of sheet "Report" to out.csv:
-
 ```sh
+# Save first 50 rows of sheet "Report" to out.csv:
 shellman excel preview data.xlsx --sheet Report --rows 50 --output out.csv
 ```
-## Notes
-File must be .xlsx
 
-Columns: A, B, C-E, etc.
+### Notes
 
-If using --info, data is shown as a table with row numbers.
+Column spec supports single letters and ranges, e.g., A,B-D.
 
----
-# Command - excel export
+With -i, output is width-aligned and row-numbered.
 
-Export one or more Excel sheets (or selected rows/columns) to CSV files.
+## excel export
 
----
+Export one or more sheets (optionally narrowed by row/column ranges) to CSV files.
+Each sheet becomes a separate CSV. Without --overwrite, a timestamp is appended to filenames.
 
-## 📝 Description
-
-Exports data from Excel sheets to CSV:
-- Choose sheets by name or index
-- Select rows (range: e.g., `2-100`)
-- Select columns (e.g., `A,B-D`)
-- Output each sheet as a separate CSV file
-- Overwrite or create new CSVs (with timestamp)
-
-Output files go to a chosen directory (default: `csv/`).
-
----
-
-## Usage
-
+### Usage
 ```sh
-shellman excel export FILE.xlsx [--sheets NAME/NUM ...] [--rows START-END] [--columns SPEC] [OPTIONS]
+shellman excel export FILE.xlsx \
+  [--sheets|-s NAME_OR_INDEX ...] [--rows|-r START-END] [--columns|-c SPEC] \
+  [--out|-o DIR] [--overwrite|-ow] [--lang-help|-lh pl|eng]
 ```
+
 Options
 ```sh
---sheets
-```
-Names or indexes of sheets to export (multiple allowed)
-```sh
---rows
-```
-Row range, e.g. 2-100
-```sh
---columns
-```
-Columns, e.g. A,B-D
-```sh
---out
-```
-Output directory (default: csv/)
-```sh
---overwrite
-```
-Overwrite files (no timestamp in names)
-```sh
---lang-help {pl,eng}
-```
-Show this help in Polish or English
+--sheets, -s TEXT (repeatable) — sheet names or indexes to export; omit to export all
 
-## Examples
-Export all sheets to CSVs in csv/:
+--rows, -r TEXT — row range start-end (e.g., 2-100)
 
+--columns, -c TEXT — columns like A,B-D
+
+--out, -o PATH — output directory (default: csv)
+
+--overwrite, -ow — overwrite (no timestamp in filenames)
+
+--lang-help, -lh pl|eng — localized help
+```
+
+Examples:
 ```sh
+# Export all sheets to csv/:
 shellman excel export data.xlsx
 ```
-Export sheet "Data" rows 2-50, columns A-E, overwrite file:
-
 ```sh
-shellman excel export data.xlsx --sheets Data --rows 2-50 --columns A-E --overwrite
+# Export sheet "Data", rows 2–50, columns A–E, without timestamp:
+shellman excel export data.xlsx -s Data -r 2-50 -c A-E -o csv --overwrite
 ```
-Export sheets 1 and 3, save CSVs to out/:
-
 ```sh
-shellman excel export data.xlsx --sheets 1 --sheets 3 --out out
+# Export sheets 1 and 3 to out/:
+shellman excel export workbook.xlsx -s 1 -s 3 -o out
 ```
-## Notes
-Only .xlsx files supported
 
-Each exported sheet is a separate CSV file
+Notes
 
-Without --overwrite, filenames include timestamp to avoid overwriting
+Supported input: .xlsx
+One CSV per sheet
+Without --overwrite, a timestamp is appended to avoid collisions
 
 ---
 # Command - file_convert
