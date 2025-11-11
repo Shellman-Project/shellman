@@ -10,3 +10,4 @@ shellman.egg-info/PKG-INFO
 shellman/cli.py
 __pycache__/
 *.pyc
+shellman.egg-info
