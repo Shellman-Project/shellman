@@ -1,6 +1,6 @@
 [project]
 name = "shellman"
-version = "1.0.8"
+version = "1.1.2"
 description = "Your friendly shell assistant"
 authors = [{name = "Jakub Marciniak", email = "jakub.marciniak.app@gmail.com"}]
 readme = "README.md"
@@ -15,6 +15,7 @@ dependencies = [
     "chardet==5.2.0",
     "pyserial==3.5",
     "psutil==7.0.0",
+    "pyzipper>=0.3.6",  # AES-encrypted ZIP support (passwords)
     "wmi; sys_platform == 'win32'",  # only install on Windows
 ]
 
@@ -26,12 +27,12 @@ packages = ["shellman"]
 
 [tool.ruff]
 line-length = 250
-target-version = "py311"  # lub twój Python
+target-version = "py311"
 
 [tool.ruff.lint]
-select = ["I", "F", "E", "W"]  # I = isort-style import sortowanie
-fixable = ["I"]                # naprawialne: importy
-ignore = []                    # możesz ignorować kody np. ["E501"]
+select = ["I", "F", "E", "W"]
+fixable = ["I"]
+ignore = []
 
 [tool.ruff.format]
 quote-style = "double"
