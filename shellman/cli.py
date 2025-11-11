@@ -12,7 +12,7 @@ from .commands import (
     file_stats,
     find_files,
     replace_text,
-    sys_summary,
+    sys,
     excel,
     csv_extract,
     json_extract,
@@ -125,7 +125,7 @@ cli.add_command(clean_files.cli,  name="clean_files")
 cli.add_command(file_convert.cli, name="file_convert")
 cli.add_command(replace_text.cli, name="replace_text")
 cli.add_command(encrypt_files.cli, name="encrypt_files")
-cli.add_command(sys_summary.cli,  name="sys_summary")
+cli.add_command(sys.cli,  name="sys")
 cli.add_command(change_line_end.cli, name="change_line_end")
 cli.add_command(excel.cli,        name="excel")
 cli.add_command(csv_extract.cli,  name="csv_extract")
