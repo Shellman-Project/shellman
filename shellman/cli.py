@@ -17,7 +17,7 @@ from .commands import (
     csv_extract,
     json_extract,
     date_utils,
-    zip_batch,
+    zip,
     speed_test,
     open_ports,
     dir_tree,
@@ -131,7 +131,7 @@ cli.add_command(excel.cli,        name="excel")
 cli.add_command(csv_extract.cli,  name="csv_extract")
 cli.add_command(json_extract.cli, name="json_extract")
 cli.add_command(date_utils.cli,   name="date_utils")
-cli.add_command(zip_batch.cli,    name="zip_batch")
+cli.add_command(zip.zip_cli, name="zip")
 cli.add_command(speed_test.cli,   name="speed_test")
 cli.add_command(open_ports.cli,   name="open_ports")
 cli.add_command(dir_tree.cli,     name="dir_tree")
