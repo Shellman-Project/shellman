@@ -258,38 +258,6 @@ def cli(lang: Optional[str]) -> None:
         click.echo("psutil not available or battery info not supported")
     click.echo()
 
-    # -------- Bluetooth -------- #
-    _print_sep("📡  Bluetooth")
-    found_bt = False
-    try:
-        if os_name == "Linux":
-            rc, out, _ = _run_cmd(["bluetoothctl", "show"])
-            if rc == 0 and out.strip():
-                for line in out.splitlines():
-                    if "Powered" in line or "Controller" in line:
-                        click.echo(line.strip())
-                        found_bt = True
-        elif os_name == "Windows":
-            # Use PowerShell if available (short timeout)
-            if shutil.which("powershell"):
-                rc, out, _ = _run_cmd(["powershell", "-Command", "Get-PnpDevice -Class Bluetooth"], timeout=3.5)
-                if rc == 0 and out.strip():
-                    for line in out.splitlines():
-                        if line.strip() and not line.startswith("Status"):
-                            click.echo(line)
-                            found_bt = True
-        elif os_name == "Darwin":
-            rc, out, _ = _run_cmd(["system_profiler", "SPBluetoothDataType"], timeout=3.5)
-            if rc == 0 and out.strip():
-                for line in out.splitlines():
-                    if any(k in line for k in ("Bluetooth", "Connected", "Manufacturer")):
-                        click.echo(line.strip())
-                        found_bt = True
-        if not found_bt:
-            click.echo("No bluetooth devices/info detected.")
-    except Exception:
-        click.echo("Bluetooth info unavailable")
-    click.echo()
 
     # -------- Tools -------- #
     _print_sep("🛠  Tools")
@@ -400,71 +368,6 @@ def cli(lang: Optional[str]) -> None:
         pass
     click.echo(f"Local IP     : {ip_local}")
     click.echo(f"Public IP    : {ip_public}\n")
-
-    # -------- Packages -------- #
-    _print_sep("📦  Packages")
-    def detect_pkg_mgr() -> str:
-        for cmd in ("apt", "dnf", "pacman", "brew", "choco", "winget", "scoop"):
-            if shutil.which(cmd):
-                return cmd
-        return "none"
-    pkg_mgr = detect_pkg_mgr()
-    count = "unknown"
-    try:
-        if pkg_mgr == "apt":
-            rc, out, _ = _run_cmd(["dpkg", "-l"], timeout=3.5)
-            if rc == 0:
-                count = str(out.count("\nii"))
-        elif pkg_mgr == "pacman":
-            rc, out, _ = _run_cmd(["pacman", "-Q"], timeout=3.5)
-            if rc == 0:
-                count = str(out.count("\n"))
-        elif pkg_mgr == "dnf":
-            rc, out, _ = _run_cmd(["dnf", "list", "installed"], timeout=3.5)
-            if rc == 0:
-                count = str(out.count("\n"))
-        elif pkg_mgr == "brew":
-            rc, out, _ = _run_cmd(["brew", "list"], timeout=3.5)
-            if rc == 0:
-                count = str(out.count("\n"))
-        elif pkg_mgr == "choco":
-            rc, out, _ = _run_cmd(["choco", "list", "-l"], timeout=5.0)
-            if rc == 0:
-                count = str(out.count("\n"))
-        elif pkg_mgr == "winget":
-            # winget may be slower; cap timeout
-            rc, out, _ = _run_cmd(["winget", "list"], timeout=5.0)
-            if rc == 0:
-                count = str(out.count("\n"))
-        elif pkg_mgr == "scoop":
-            rc, out, _ = _run_cmd(["scoop", "list"], timeout=3.5)
-            if rc == 0:
-                count = str(out.count("\n"))
-    except Exception:
-        pass
-    click.echo(f"Pkg Manager  : {pkg_mgr}")
-    click.echo(f"Total pkgs   : {count}\n")
-
-    # -------- Printers -------- #
-    _print_sep("🖨️  Printers")
-    printers: list[str] = []
-    try:
-        if os_name == "Windows":
-            rc, out, _ = _run_cmd(["wmic", "printer", "get", "name"], timeout=3.0)
-            if rc == 0:
-                printers = [ln.strip() for ln in out.splitlines()[1:] if ln.strip()]
-        elif os_name in ("Linux", "Darwin"):
-            rc, out, _ = _run_cmd(["lpstat", "-p"], timeout=3.0)
-            if rc == 0:
-                printers = [ln.split()[1] for ln in out.splitlines() if ln.startswith("printer ")]
-    except Exception:
-        pass
-    if printers:
-        for p in printers:
-            click.echo(f"Printer      : {p}")
-    else:
-        click.echo("No printers found.")
-    click.echo()
 
     # -------- Wi-Fi -------- #
     _print_sep("📶  Wi-Fi")
