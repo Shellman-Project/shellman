@@ -3,20 +3,11 @@ import importlib.resources
 import click
 
 from .commands import (
-    change_line_end,
     checksum_files,
-    clean_files,
-    encrypt_files,
-    lines,
-    file_convert,
     file_stats,
     find_files,
-    replace_text,
     sys,
     excel,
-    csv_extract,
-    json_extract,
-    date_utils,
     zip,
     speed_test,
     open_ports,
@@ -106,7 +97,7 @@ class ShellmanGroup(click.Group):
 @click.pass_context
 def cli(ctx):
     """
-    Shellman – your friendly shell assistant 💬
+    Shellman – your friendly shell assistant 
 
     For command help in your lang:
       shellman count_lines --lang-help pl
@@ -121,21 +112,12 @@ def cli(ctx):
 cli.add_command(file_stats.cli,   name="file_stats")
 cli.add_command(find_files.cli,   name="find_files")
 cli.add_command(checksum_files.cli, name="checksum_files")
-cli.add_command(clean_files.cli,  name="clean_files")
-cli.add_command(file_convert.cli, name="file_convert")
-cli.add_command(replace_text.cli, name="replace_text")
-cli.add_command(encrypt_files.cli, name="encrypt_files")
 cli.add_command(sys.cli,  name="sys")
-cli.add_command(change_line_end.cli, name="change_line_end")
 cli.add_command(excel.cli,        name="excel")
-cli.add_command(csv_extract.cli,  name="csv_extract")
-cli.add_command(json_extract.cli, name="json_extract")
-cli.add_command(date_utils.cli,   name="date_utils")
 cli.add_command(zip.zip_cli, name="zip")
 cli.add_command(speed_test.cli,   name="speed_test")
 cli.add_command(open_ports.cli,   name="open_ports")
 cli.add_command(dir_tree.cli,     name="dir_tree")
-cli.add_command(lines.cli,        name="lines")
 
 
 @cli.command(name="help")
