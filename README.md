@@ -91,5 +91,6 @@ command	short description:
 | open_ports      | Show currently open TCP/UDP ports (process, pid, address, state)| `shellman open_ports`                   |
 | speed_test      | Run a quick internet speed test (download, upload, ping)        | `shellman speed_test`                   |
 | dir_tree        | Prints a visual tree of directories (like `tree`)               | `shellman dir_tree ./src -f -d 2`       |
+| observe_dir | Observe a directory and print full contents of files - helpful during tests | `shellman observe_dir ./test -s 1 ` |
 
 
