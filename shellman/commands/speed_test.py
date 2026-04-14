@@ -27,7 +27,7 @@ def cli(json_out, only, lang):
         _print_help_md(lang)
         return
 
-    # ---- 1) Spróbuj oficjalnego binarnego klienta Ookla ------------------ #
+    # ---- 1) Try oficial binar client Ookla ------------------ #
     if shutil.which("speedtest"):
         if _is_ookla_binary("speedtest"):
             try:
@@ -40,7 +40,7 @@ def cli(json_out, only, lang):
             except Exception:
                 pass  # spadnij niżej
 
-    # ---- 2) speedtest-cli binary (python) -------------------------------- #
+    # ---- 2) speedtest-cli binar (python) -------------------------------- #
     if shutil.which("speedtest-cli"):
         try:
             raw = subprocess.check_output(

@@ -84,23 +84,13 @@ command	short description:
 |-----------------|--------------------------------------|---------------------------------------------|
 | excel | Excel utilities: info / preview / export | shellman excel info data.xlsx |
 | find_files      | Locate files by name, content or extension  | `shellman find_files ./src --name util` |
-| change_line_end | LF ↔ CRLF conversion / check                | `shellman change_line_end file.txt`     |
 | checksum_files  | Create or verify checksums (sha256, md5, sha1)   | `shellman checksum_files ./downloads`   |
-| clean_files     | Delete junk files by name, ext or age   | `shellman clean_files ./tmp --ext log`  |
-| count_lines     | Count lines in files                                                    | `shellman count_lines ./src`            |
-| extract_lines   | Extract or summarize lines with filters and context                     | `shellman extract_lines ./src --contains TODO` |
-| csv_extract     | Extract columns/rows from CSV                                           | `shellman csv_extract data.csv --cols 1,3` |
-| date_utils      | Add/subtract dates, diff, strftime                                      | `shellman date_utils --add 5d`          |
-| encrypt_files   | AES-256 encrypt / decrypt with password                                 | `shellman encrypt_files secret.txt`     |
-| file_convert    | Convert between JSON, YAML, TOML                                        | `shellman file_convert config.toml json`|
 | file_stats      | Show path, size, line-count, extension                                  | `shellman file_stats ./src`             |
-| json_extract    | JSON path, filter and field selection                                   | `shellman json_extract data.json --path user.name` |
-| merge_files     | Merge multiple text files into one                                      | `shellman merge_files ./logs -o merged.txt` |
-| replace_text    | Batch find-&-replace with diff preview                                  | `shellman replace_text ./docs --find old --replace new --preview` |
-| sys_summary     | System / shell / resource report                                        | `shellman sys_summary`                  |
-| zip       | Bulk ZIP creation (per-folder or flat)                          | `shellman zip pack example_folder -pass example_password`         |
+| sys             | System / shell / resource report                                        | `shellman sys`                  |
+| zip             | Bulk ZIP creation (per-folder or flat)                          | `shellman zip pack example_folder -pass example_password`         |
 | open_ports      | Show currently open TCP/UDP ports (process, pid, address, state)| `shellman open_ports`                   |
 | speed_test      | Run a quick internet speed test (download, upload, ping)        | `shellman speed_test`                   |
 | dir_tree        | Prints a visual tree of directories (like `tree`)               | `shellman dir_tree ./src -f -d 2`       |
+| observe_dir | Observe a directory and print full contents of files - helpful during tests | `shellman observe_dir ./test -s 1 ` |
 
 
