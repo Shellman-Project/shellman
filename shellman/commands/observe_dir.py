@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import time
 from collections import deque
 from datetime import datetime
@@ -8,18 +9,45 @@ from typing import Deque
 
 import click
 
+ALERT_PATTERN = re.compile(
+    r"(?i)\b(?:bug|error|failed|fail|failure|fatal|exception|traceback|panic|critical|segfault)\b"
+)
+
 
 def _timestamp_now() -> str:
     """Return the current local timestamp for file markers."""
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
-def _echo_text(text: str, *, is_green: bool, nl: bool = True) -> None:
-    """Print text using alternating color blocks for observed files."""
+def _echo_plain(text: str, *, is_green: bool) -> None:
+    """Print plain text without alert highlighting."""
+    if not text:
+        return
+
     if is_green:
-        click.secho(text, fg="green", nl=nl)
+        click.secho(text, fg="green", nl=False)
     else:
-        click.echo(text, nl=nl)
+        click.echo(text, nl=False)
+
+
+def _echo_text(text: str, *, is_green: bool, nl: bool = True) -> None:
+    """Print text with alert keywords forced to red."""
+    last_end = 0
+
+    for match in ALERT_PATTERN.finditer(text):
+        start, end = match.span()
+
+        if start > last_end:
+            _echo_plain(text[last_end:start], is_green=is_green)
+
+        click.secho(match.group(0), fg="red", nl=False)
+        last_end = end
+
+    if last_end < len(text):
+        _echo_plain(text[last_end:], is_green=is_green)
+
+    if nl:
+        click.echo()
 
 
 def _print_marker(kind: str, file_path: Path, *, is_green: bool) -> None:
