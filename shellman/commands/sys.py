@@ -23,14 +23,13 @@ import platform
 import shutil
 import socket
 import subprocess
-import sys
 from pathlib import Path
 from typing import Optional
 
 import click
 
-
 # ───────────────────────────── Helpers ───────────────────────────── #
+
 
 def _is_git_bash() -> bool:
     """Heuristically detect Git Bash on Windows to show a friendly tip."""
@@ -258,9 +257,9 @@ def cli(lang: Optional[str]) -> None:
         click.echo("psutil not available or battery info not supported")
     click.echo()
 
-
     # -------- Tools -------- #
     _print_sep("🛠  Tools")
+
     def _w(cmd: str) -> str:
         return shutil.which(cmd) or "not found"
     click.echo(f"python3      : {_w('python3')}")
@@ -310,6 +309,7 @@ def cli(lang: Optional[str]) -> None:
     else:
         try:
             import datetime
+
             import psutil  # type: ignore
 
             boot = psutil.boot_time()

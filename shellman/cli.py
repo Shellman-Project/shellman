@@ -12,6 +12,7 @@ from .commands import (
     speed_test,
     open_ports,
     dir_tree,
+    observe_dir,
 )
 
 try:
@@ -118,6 +119,7 @@ cli.add_command(zip.zip_cli, name="zip")
 cli.add_command(speed_test.cli,   name="speed_test")
 cli.add_command(open_ports.cli,   name="open_ports")
 cli.add_command(dir_tree.cli,     name="dir_tree")
+cli.add_command(observe_dir.cli, name="observe_dir")
 
 
 @cli.command(name="help")
