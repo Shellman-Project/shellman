@@ -1,8 +1,12 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "shellman"
 version = "1.1.2"
 description = "Your friendly shell assistant"
-authors = [{name = "Jakub Marciniak", email = "jakub.marciniak.app@gmail.com"}]
+authors = [{ name = "Jakub Marciniak", email = "jakub.marciniak.app@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
@@ -15,19 +19,23 @@ dependencies = [
     "chardet==5.2.0",
     "pyserial==3.5",
     "psutil==7.0.0",
-    "pyzipper>=0.3.6",  # AES-encrypted ZIP support (passwords)
-    "wmi; sys_platform == 'win32'",  # only install on Windows
+    "pyzipper>=0.3.6",
+    "wmi; sys_platform == 'win32'",
 ]
 
 [project.scripts]
 shellman = "shellman.cli:cli"
 
-[tool.setuptools]
-packages = ["shellman"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["shellman*"]
+
+[tool.setuptools.package-data]
+shellman = ["help_texts/**/*"]
 
 [tool.ruff]
-line-length = 250
-target-version = "py311"
+line-length = 120
+target-version = "py38"
 
 [tool.ruff.lint]
 select = ["I", "F", "E", "W"]
@@ -38,6 +46,3 @@ ignore = []
 quote-style = "double"
 indent-style = "space"
 docstring-code-format = true
-
-[tool.setuptools.package-data]
-"shellman" = ["help_texts/**"]
